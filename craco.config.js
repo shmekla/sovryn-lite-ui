@@ -1,5 +1,3 @@
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-
 module.exports = {
   style: {
     postcss: {
@@ -9,7 +7,4 @@ module.exports = {
       ],
     },
   },
-  webpack: {
-    plugins: process.env.ANALYZER === 'test' ? [new BundleAnalyzerPlugin()] : []
-  }
 };

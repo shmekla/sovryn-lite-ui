@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html, body {
+        @apply bg-black text-white;
+    }
+
+    html.dialog-open, body.dialog-open {
+        @apply overflow-hidden;
+    }
+
+    h1 {
+        @apply mb-10 text-2xl;
+    }
+}
+
+@layer components {
+    #root {
+        display: block;
+    }
+
+    .dialog-wrapper {
+        @apply fixed inset-0;
+        @apply flex flex-col justify-center items-center;
+    }
+
+    .dialog--backdrop {
+        @apply fixed inset-0;
+        @apply bg-black bg-opacity-60;
+    }
+
+    .dialog--container {
+        @apply overflow-y-auto w-full;
+    }
+
+    .dialog {
+        @apply bg-gray-900 my-16 px-12 py-8 rounded-lg w-full shadow-lg max-w-4xl w-full mx-auto;
+        @apply relative;
+    }
+
+    .dialog--container__mini .dialog {
+        max-width: 400px;
+    }
+
+    .dialog--container__confirmation .dialog {
+        max-width: 470px;
+        padding: 1.5rem;
+        margin-left: auto;
+    }
+
+    .form-group {
+        @apply mb-6;
+    }
+
+    .form-group label {
+        @apply block text-sm mb-2;
+    }
+
+
+    .overlay-enter {
+        opacity: 0;
+    }
+    .overlay-enter-active {
+        opacity: 1;
+        transition: opacity 300ms ease-in;
+    }
+    .overlay-exit {
+        opacity: 1;
+    }
+    .overlay-exit-active {
+        opacity: 0;
+        transition: opacity 300ms ease-in;
+    }
+
+    .dialog-enter {
+        opacity: 0;
+        transform: scale(0, 0);
+    }
+    .dialog-enter-active {
+        opacity: 1;
+        transform: scale(1, 1);
+        transition: opacity 300ms ease-in, transform 300ms ease-in;
+    }
+    .dialog-exit {
+        opacity: 1;
+        transform: scale(1, 1);
+    }
+    .dialog-exit-active {
+        opacity: 0;
+        transform: scale(0, 0);
+        transition: opacity 300ms ease-in, transform 300ms ease-in;
+    }
+}

@@ -1,26 +1,28 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+} from "react-router-dom";
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { AppContextProvider } from './context/app-context';
+import { NotFoundPage } from './app/pages/NotFoundPage/Loadable';
+import { HomePage } from './app/pages/HomePage/Loadable';
+import { LendPage } from './app/pages/LendPage/Loadable';
 
-function App() {
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <HelmetProvider>
+      <Helmet titleTemplate="%s | Defray" />
+      <AppContextProvider>
+        <Router>
+          <Switch>
+            <Route exact path="/" component={HomePage}/>
+            <Route exact path="/lend" component={LendPage}/>
+            <Route component={NotFoundPage}/>
+          </Switch>
+        </Router>
+      </AppContextProvider>
+    </HelmetProvider>
   );
 }
-
-export default App;
