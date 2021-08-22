@@ -21,3 +21,16 @@ export const getLoanToken = (token: TOKEN) => loans[getCurrentNetwork().id]
 export const toNumber = (value: string, decimals: number) => bignumber(value).div(10 ** 18).toFixed(decimals);
 
 export const toWei = (value: number, decimals: number = 18) => bignumber(value).mul(10 ** decimals).toFixed(0);
+
+export const noop = () => {};
+
+export const nFormatter = (value: number | string) => {
+  value = Number(value);
+  if (value >= 1000000) {
+    return (value / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+  }
+  if (value >= 1000) {
+    return (value / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+  }
+  return value;
+};

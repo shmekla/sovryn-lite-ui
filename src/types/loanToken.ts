@@ -5,5 +5,6 @@ export type LoanTokenType = {
   token: TOKEN;
   address: string;
   abi: ethers.ContractInterface;
+  iTokenSymbol: string;
   usesLm?: boolean;
 };

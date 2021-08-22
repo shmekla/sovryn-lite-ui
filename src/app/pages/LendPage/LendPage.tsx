@@ -1,25 +1,35 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { listLoanTokens } from 'utils/helpers';
 import { Nullable } from 'types/nullable';
 import { TOKEN } from 'types/token';
 import MainTemplate from '../../template/MainTemplate';
 import { LendingPool } from './components/LendingPool';
-import { Dialog } from '../../molecule/Dialog';
+import LendDialog from './components/LendDialog';
+import AppContext from '../../../context/app-context';
+import walletService from '../../../utils/walletService';
 
 function LendPage() {
+
+  const { connected } = useContext(AppContext);
 
   const [dialogs, setDialogs] = useState<{ token: Nullable<TOKEN>; lend: boolean; unlend: boolean; }>({ token: null, lend: false, unlend: false });
 
   const loanPools = useMemo(() => listLoanTokens(), []);
 
-  const openLend = useCallback((token: TOKEN) => {
+  const openLend = useCallback(async (token: TOKEN) => {
+    if (!connected) {
+      await walletService.connect();
+    }
     setDialogs(prevState => ({...prevState, token, lend: true, unlend: false }));
-  }, []);
+  }, [connected]);
 
-  const openUnlend = useCallback((token: TOKEN) => {
+  const openUnlend = useCallback(async (token: TOKEN) => {
+    if (!connected) {
+      await walletService.connect();
+    }
     setDialogs(prevState => ({...prevState, token, unlend: true, lend: false }));
-  }, []);
+  }, [connected]);
 
   const closeDialog = useCallback(() => {
     setDialogs(prevState => ({...prevState, token: null, lend: false, unlend: false }));
@@ -35,18 +45,11 @@ function LendPage() {
 
           <h1>Lend</h1>
 
-          <div className="grid grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {loanPools.map(pool => <LendingPool key={pool.token} {...pool} onLend={openLend} onUnlend={openUnlend} />)}
           </div>
 
-
-          <Dialog isOpen={dialogs.lend} onClose={closeDialog}>
-            <>
-              <div className="w-24 h-48">item</div>
-              <div className="w-24 h-48">item</div>
-              <div className="w-24 h-48">item</div>
-            </>
-          </Dialog>
+          <LendDialog pool={dialogs.token!} isOpen={dialogs.lend} onClose={closeDialog} />
         </div>
       </main>
     </MainTemplate>

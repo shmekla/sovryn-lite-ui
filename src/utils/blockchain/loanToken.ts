@@ -3,6 +3,7 @@ import { TOKEN } from 'types/token';
 import contractReader from '../contractReader';
 import { getLoanToken } from '../helpers';
 import { zeroAddress } from '../constants';
+import walletService from '../walletService';
 
 const loanToken = new class LoanToken {
 
@@ -69,6 +70,22 @@ const loanToken = new class LoanToken {
       //   parser: (value) => value[0].toString(),
       // },
     ]).then(({ returnData }) => returnData);
+  }
+
+  public lend(token: TOKEN, amount: string) {
+    const { address, abi, usesLm } = getLoanToken(token);
+    const data = contractReader
+      .encodeFunctionData(
+        address,
+        abi,
+        token === TOKEN.RBTC ? 'mintWithBTC' : 'mint',
+        [walletService.address, ...(token === TOKEN.RBTC ? [usesLm] : [amount, usesLm])]
+      );
+    return walletService.sendTransaction({
+      to: address,
+      value: token === TOKEN.RBTC ? amount : '0',
+      data,
+    });
   }
 
   public call<T = string>(token: TOKEN, fnName: string, args: any[]) {

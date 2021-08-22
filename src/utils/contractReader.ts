@@ -45,8 +45,6 @@ const contractReader = new class ContractReader {
       ),
     }));
 
-    console.log(data);
-
     return this.call<{ blockNumber: string; returnData: T }>(
       network.multiCallContractAddress,
       multicallAbi,

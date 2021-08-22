@@ -5,6 +5,25 @@ import { getLoanToken } from '../helpers';
 import { zeroAddress } from '../constants';
 import { getCurrentNetwork } from '../network';
 
+type UserInfo = {
+  amount: string;
+  accumulatedReward: string;
+  rewardDebt: string;
+};
+
+export type LendingInfoResponse = {
+  marketLiquidity: string;
+  supplyInterestRate: string;
+  tokenPrice: string;
+  totalAssetSupply: string;
+  profitOf: string;
+  balanceOf: string;
+  assetBalanceOf: string;
+  getUserAccumulatedReward: string;
+  getUserInfo: UserInfo;
+  getUserInfoList: UserInfo[];
+};
+
 const liquidityMining = new class LiquidityMining {
 
   public getLendingInfo(token: TOKEN, owner?: string) {
@@ -13,7 +32,7 @@ const liquidityMining = new class LiquidityMining {
     if (!owner) {
       owner = zeroAddress;
     }
-    return contractReader.multiCall<{ marketLiquidity: string; supplyInterestRate: string; tokenPrice: string; totalAssetSupply: string; getUserInfo: { amount: string; accumulatedReward: string; rewardDebt: string } }>([
+    return contractReader.multiCall<LendingInfoResponse>([
       {
         address,
         abi,
@@ -57,9 +76,25 @@ const liquidityMining = new class LiquidityMining {
       {
         address,
         abi,
+        fnName: 'assetBalanceOf',
+        args: [owner],
+        key: 'assetBalanceOf',
+        parser: (value) => value[0].toString(),
+      },
+      {
+        address,
+        abi,
         fnName: 'profitOf',
         args: [owner],
         key: 'profitOf',
+        parser: (value) => value[0].toString(),
+      },
+      {
+        address: liquidityMiningProxy,
+        abi: liquidityMiningAbi,
+        fnName: 'getPoolId',
+        args: [address],
+        key: 'getPoolId',
         parser: (value) => value[0].toString(),
       },
       {
@@ -91,6 +126,18 @@ const liquidityMining = new class LiquidityMining {
         }),
       },
       {
+        address: liquidityMiningProxy,
+        abi: liquidityMiningAbi,
+        fnName: 'getUserInfoList',
+        args: [address],
+        key: 'getUserInfoList',
+        parser: (value) => value[0].map((item: any) => ({
+          accumulatedReward: item.accumulatedReward.toString(),
+          amount: item.amount.toString(),
+          rewardDebt: item.rewardDebt.toString(),
+        })),
+      },
+      {
         address,
         abi,
         fnName: 'tokenPrice',
@@ -100,6 +147,10 @@ const liquidityMining = new class LiquidityMining {
       },
     ]).then(({ returnData }) => returnData);
   }
+
+  public lend(pool: TOKEN, amount: string) {
+  }
+
 
   // public call<T = string>(token: TOKEN, fnName: string, args: any[]) {
   //   const { address, abi } = getLoanToken(token);

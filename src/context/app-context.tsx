@@ -5,6 +5,7 @@ import { NETWORK } from '../types/network';
 type AppContextType = {
   address: string;
   balance: string;
+  connected: boolean;
   network: NETWORK,
 };
 
@@ -17,6 +18,7 @@ type AppContextActionType = {
 const defaultValue: AppContextType = {
   address: '',
   balance: '0',
+  connected: false,
   network: NETWORK.RSK,
 };
 
@@ -28,7 +30,7 @@ export const AppContextProvider: React.FC = ({children}) => {
 
   const setAddress = useCallback((address: string) => {
     console.log('address changed', address);
-    setValue(prevState => ({...prevState, address}));
+    setValue(prevState => ({...prevState, address, connected: !!address }));
   }, []);
 
   const setNetwork = useCallback((network: NETWORK) => {

@@ -17,7 +17,7 @@ export default function UserWalletContainer() {
   }, []);
 
   return (
-    <div>
+    <div className="hidden sm:block">
       {address && <EngagedWalletHeaderButton address={address} balance={balance} onClick={handleDisconnection} />}
       {!address && <><EngageWalletHeaderButton onClick={handleConnection}/></>}
     </div>

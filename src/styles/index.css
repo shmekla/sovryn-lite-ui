@@ -14,6 +14,12 @@
     h1 {
         @apply mb-10 text-2xl;
     }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
 }
 
 @layer components {
@@ -36,18 +42,8 @@
     }
 
     .dialog {
-        @apply bg-gray-900 my-16 px-12 py-8 rounded-lg w-full shadow-lg max-w-4xl w-full mx-auto;
+        @apply bg-gray-900 my-16 px-12 py-8 rounded-xl w-full shadow-lg max-w-xl w-full mx-auto;
         @apply relative;
-    }
-
-    .dialog--container__mini .dialog {
-        max-width: 400px;
-    }
-
-    .dialog--container__confirmation .dialog {
-        max-width: 470px;
-        padding: 1.5rem;
-        margin-left: auto;
     }
 
     .form-group {
