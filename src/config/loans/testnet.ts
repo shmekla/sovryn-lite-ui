@@ -9,7 +9,7 @@ const testnet: LoanTokenType[] = [
     address: '0xe67Fe227e0504e8e96A34C3594795756dC26e14B',
     abi: rbtcLoanAbi,
     iTokenSymbol: 'iRBTC',
-    usesLm: true,
+    usesLm: false,
   },
   {
     token: TOKEN.XUSD,
@@ -23,21 +23,21 @@ const testnet: LoanTokenType[] = [
     address: '0xd1f225BEAE98ccc51c468d1E92d0331c4f93e566',
     abi: loanAbi,
     iTokenSymbol: 'iRUSDT',
-    usesLm: true,
+    usesLm: false,
   },
   {
     token: TOKEN.DOC,
     address: '0x74e00A8CeDdC752074aad367785bFae7034ed89f',
     abi: loanAbi,
     iTokenSymbol: 'iSUSD',
-    usesLm: true,
+    usesLm: false,
   },
   {
     token: TOKEN.BPRO,
     address: '0x6226b4B3F29Ecb5f9EEC3eC3391488173418dD5d',
     abi: loanAbi,
     iTokenSymbol: 'iBPRO',
-    usesLm: true,
+    usesLm: false,
   },
 ];
 

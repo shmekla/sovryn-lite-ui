@@ -1,5 +1,4 @@
 import { TOKEN } from 'types/token';
-import liquidityMiningAbi from 'utils/blockchain/abi/LiquidityMining.json';
 import contractReader from '../contractReader';
 import { getLoanToken } from '../helpers';
 import { zeroAddress } from '../constants';
@@ -27,7 +26,7 @@ export type LendingInfoResponse = {
 const liquidityMining = new class LiquidityMining {
 
   public getLendingInfo(token: TOKEN, owner?: string) {
-    const { address, abi } = getLoanToken(token);
+    const { address } = getLoanToken(token);
     const { liquidityMiningProxy } = getCurrentNetwork();
     if (!owner) {
       owner = zeroAddress;
@@ -35,137 +34,110 @@ const liquidityMining = new class LiquidityMining {
     return contractReader.multiCall<LendingInfoResponse>([
       {
         address,
-        abi,
-        fnName: 'marketLiquidity',
+        fnName: 'marketLiquidity()(uint256)',
         args: [],
         key: 'marketLiquidity',
         parser: (value) => value[0].toString(),
       },
       {
         address,
-        abi,
-        fnName: 'tokenPrice',
+        fnName: 'tokenPrice()(uint256)',
         args: [],
         key: 'tokenPrice',
         parser: (value) => value[0].toString(),
       },
       {
         address,
-        abi,
-        fnName: 'supplyInterestRate',
+        fnName: 'supplyInterestRate()(uint256)',
         args: [],
         key: 'supplyInterestRate',
         parser: (value) => value[0].toString(),
       },
       {
         address,
-        abi,
-        fnName: 'totalAssetSupply',
+        fnName: 'totalAssetSupply()(uint256)',
         args: [],
         key: 'totalAssetSupply',
         parser: (value) => value[0].toString(),
       },
       {
         address,
-        abi,
-        fnName: 'balanceOf',
+        fnName: 'balanceOf(address)(uint256)',
         args: [owner],
         key: 'balanceOf',
         parser: (value) => value[0].toString(),
       },
       {
         address,
-        abi,
-        fnName: 'assetBalanceOf',
+        fnName: 'assetBalanceOf(address)(uint256)',
         args: [owner],
         key: 'assetBalanceOf',
         parser: (value) => value[0].toString(),
       },
       {
         address,
-        abi,
-        fnName: 'profitOf',
+        fnName: 'profitOf(address)(uint256)',
         args: [owner],
         key: 'profitOf',
         parser: (value) => value[0].toString(),
       },
       {
         address: liquidityMiningProxy,
-        abi: liquidityMiningAbi,
-        fnName: 'getPoolId',
+        fnName: 'getPoolId(address)(uint256)',
         args: [address],
         key: 'getPoolId',
         parser: (value) => value[0].toString(),
       },
       {
         address: liquidityMiningProxy,
-        abi: liquidityMiningAbi,
-        fnName: 'getUserAccumulatedReward',
+        fnName: 'getUserAccumulatedReward(address,address)(uint256)',
         args: [address, owner],
         key: 'getUserAccumulatedReward',
         parser: (value) => value[0].toString(),
       },
       {
         address: liquidityMiningProxy,
-        abi: liquidityMiningAbi,
-        fnName: 'getPoolInfo',
+        fnName: 'getPoolInfo(address)((address,uint96,uint256,uint256))',
         args: [address],
         key: 'getPoolInfo',
-        // parser: (value) => value[0].toString(),
-      },
-      {
-        address: liquidityMiningProxy,
-        abi: liquidityMiningAbi,
-        fnName: 'getUserInfo',
-        args: [address, owner],
-        key: 'getUserInfo',
         parser: (value) => ({
-          accumulatedReward: value[0].accumulatedReward.toString(),
-          amount: value[0].amount.toString(),
-          rewardDebt: value[0].rewardDebt.toString(),
+          poolToken: value[0][0],
+          allocationPoint: value[0][1].toString(),
+          lastRewardBlock: value[0][2].toString(),
+          accumulatedRewardPerShare: value[0][3].toString(),
         }),
       },
       {
         address: liquidityMiningProxy,
-        abi: liquidityMiningAbi,
-        fnName: 'getUserInfoList',
+        fnName: 'getUserInfo(address,address)(uint256,uint256,uint256)',
+        args: [address, owner],
+        key: 'getUserInfo',
+        parser: value => ({
+          amount: value[0].toString(),
+          rewardDebt: value[1].toString(),
+          accumulatedReward: value[2].toString(),
+        })
+      },
+      {
+        address: liquidityMiningProxy,
+        fnName: 'getUserInfoList(address)((uint256,uint256,uint256)[])',
         args: [address],
         key: 'getUserInfoList',
         parser: (value) => value[0].map((item: any) => ({
-          accumulatedReward: item.accumulatedReward.toString(),
-          amount: item.amount.toString(),
-          rewardDebt: item.rewardDebt.toString(),
+          amount: item[0].toString(),
+          rewardDebt: item[1].toString(),
+          accumulatedReward: item[2].toString(),
         })),
       },
       {
         address,
-        abi,
-        fnName: 'tokenPrice',
+        fnName: 'tokenPrice()(uint256)',
         args: [],
         key: 'tokenPrice',
         parser: (value) => value[0].toString(),
       },
     ]).then(({ returnData }) => returnData);
   }
-
-  public lend(pool: TOKEN, amount: string) {
-  }
-
-
-  // public call<T = string>(token: TOKEN, fnName: string, args: any[]) {
-  //   const { address, abi } = getLoanToken(token);
-  //   return contractReader.call<T>(address, abi, fnName, args);
-  // }
-  //
-  // public encodeFunctionData(token: TOKEN, fnName: string, args: any[]) {
-  //   const { address, abi } = getLoanToken(token);
-  //   return contractReader.encodeFunctionData(address, abi, fnName, args);
-  // }
-  //
-  // public decodeFunctionResult(token: TOKEN, fnName: string, data: ethers.utils.BytesLike) {
-  //   const { address, abi } = getLoanToken(token);
-  //   return contractReader.decodeFunctionResult(address, abi, fnName, data);
-  // }
 
 }();
 

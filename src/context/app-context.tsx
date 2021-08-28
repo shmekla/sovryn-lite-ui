@@ -53,11 +53,23 @@ export const AppContextProvider: React.FC = ({children}) => {
     }
   }, [setAddress, setBalance]);
 
+  const handleNetworkChange = useCallback(async (network: string) => {
+    console.log('handle network change', network);
+    // setAddress(address);
+    // if (address) {
+    //   const result: string = await walletService.provider.request({ method: 'eth_getBalance', params: [address, 'latest' ]});
+    //   setBalance(Number(result).toString());
+    // } else {
+    //   setBalance('0');
+    // }
+  }, [setAddress, setBalance]);
 
   useEffect(() => {
     walletService.on('addressChanged', handleAddressChange);
+    walletService.on('chainChanged', handleNetworkChange);
     return () => {
       walletService.off('addressChanged', handleAddressChange);
+      walletService.off('chainChanged', handleNetworkChange);
     };
   }, [handleAddressChange]);
 

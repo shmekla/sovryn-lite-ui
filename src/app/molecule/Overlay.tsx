@@ -82,14 +82,14 @@ export function Overlay(props: OverlayProps) {
     return items;
   }, [props.children, props.isOpen, maybeRenderChild, maybeRenderBackdrop]);
 
-  const handleKeyDown = (e: any) => console.log(e);
+  // const handleKeyDown = (e: any) => console.log(e);
 
   const transitionGroup = useMemo(() => {
     return (
       <TransitionGroup
         appear={true}
         className={cn('overlay', props.isOpen && 'overlay-open')}
-        onKeyDown={handleKeyDown}
+        // onKeyDown={handleKeyDown}
         ref={containerRef}
       >
         {childrenWithTransitions}

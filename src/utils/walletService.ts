@@ -1,7 +1,8 @@
-import type { TransactionRequest } from '@ethersproject/abstract-provider';
+import { TransactionRequest } from '@ethersproject/abstract-provider';
 import { NETWORK } from 'types/network';
 import { EventBag } from './eventBag';
-import { getCurrentNetwork } from './network';
+import { getCurrentNetwork, getNetwork } from './network';
+import { BigNumber } from 'ethers';
 
 const walletService = new class WalletService extends EventBag {
   private _network: NETWORK;
@@ -18,6 +19,7 @@ const walletService = new class WalletService extends EventBag {
 
     if (ethereum) {
       if (web3) {
+        console.log('web3', web3);
         // Overwriting injected web3 with never provider version.
         // window.web3 = new Web3(ethereum);
       }
@@ -49,7 +51,7 @@ const walletService = new class WalletService extends EventBag {
     this.emit('connect');
     return this.provider.request({ method: 'eth_requestAccounts' }).then(async result => {
       try {
-        this.setAddress(result[0]);
+        // this.setAddress(result[0]);
         this.emit('connected', result[0]);
         return true;
       } catch (e) {
@@ -83,9 +85,36 @@ const walletService = new class WalletService extends EventBag {
   public setProvider(provider: InPageProvider) {
     this._provider = provider;
     this.emit('providerChanged', this._provider);
+
+    this.provider.on('accountsChanged', accounts => this.setAddress(accounts[0] || ''));
+    this.provider.on('chainChanged', chainId => {
+      this._network = getNetwork(chainId as unknown as NETWORK)?.id || NETWORK.UNKNOWN;
+      this.emit('chainChanged', Number(chainId));
+      this.connect().catch(console.error);
+    });
   }
 
-  public sendTransaction(tx: TransactionRequest) {
+  public async sendTransaction(tx: TransactionRequest) {
+    tx.from = this.address.toLowerCase();
+
+    if (tx.value) {
+      tx.value = BigNumber.from(tx.value).toHexString();
+    }
+
+    if (tx.to) {
+      tx.to = tx.to.toLowerCase();
+    }
+
+    // // todo: start using this with hardware wallet implementation (also add nonce).
+    // if (!tx.gasPrice) {
+    //   tx.gasPrice = await this.provider.request({
+    //     method: 'eth_gasPrice',
+    //     params: [],
+    //   });
+    // }
+
+    console.log('tx', tx);
+
     return this.provider.request({
       method: 'eth_sendTransaction',
       params: [tx],

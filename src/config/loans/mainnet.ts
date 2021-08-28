@@ -9,7 +9,7 @@ const mainnet: LoanTokenType[] = [
     address: '0xa9DcDC63eaBb8a2b6f39D7fF9429d88340044a7A',
     abi: rbtcLoanAbi,
     iTokenSymbol: 'iRBTC',
-    usesLm: true,
+    usesLm: false,
   },
   {
     token: TOKEN.XUSD,

@@ -1,14 +1,22 @@
 import { ethers } from 'ethers';
 import type { TransactionRequest } from '@ethersproject/abstract-provider';
-import multicallAbi from 'utils/blockchain/abi/multicall.json';
+import type { Deferrable } from '@ethersproject/properties';
 import { NETWORK } from 'types/network';
 import { getCurrentNetwork } from './network';
 import { RpcNetwork } from './rpcNetwork';
 import walletService from './walletService';
+import {
+  decodeParameters,
+  encodeFunctionDataWithTypes,
+  encodeParameters,
+  functionSignature,
+  prepareFunction,
+} from './helpers';
+import { hexConcat, Result } from 'ethers/lib/utils';
+import { BytesLike } from '@ethersproject/bytes';
 
 interface MultiCallData {
   address: string;
-  abi: ethers.ContractInterface;
   fnName: string;
   args: any[];
   key: string;
@@ -35,70 +43,79 @@ const contractReader = new class ContractReader {
 
     const network = getCurrentNetwork();
 
-    const data = callData.map(item => ({
-      target: item.address,
-      callData: this.encodeFunctionData(
-        item.address,
-        item.abi,
-        item.fnName,
-        item.args,
-      ),
-    }));
+    const items = callData.map(item => {
+      const { method, types, returnTypes } = prepareFunction(item.fnName);
+      return {
+        target: item.address,
+        callData: encodeFunctionDataWithTypes(method, types, item.args),
+        returns: (data: BytesLike) => {
+          try {
+            return decodeParameters(returnTypes, data)
+          } catch (e) {
+            console.error('decodeParameters::', method, types, returnTypes, data);
+            console.error(e);
+            return data;
+          }
+        },
+        key: item.key,
+        parser: item.parser,
+      };
+    });
 
-    return this.call<{ blockNumber: string; returnData: T }>(
-      network.multiCallContractAddress,
-      multicallAbi,
-      'aggregate',
-      [data],
-    ).then(({ blockNumber, returnData }) => {
-      const data: T = {} as T;
-      callData.forEach((item, index) => {
-        const value = this.decodeFunctionResult(
-          item.address,
-          item.abi,
-          item.fnName,
-          // @ts-ignore
-          returnData[index],
-        );
+    const data = encodeFunctionDataWithTypes('aggregate((address,bytes)[])', [{
+      components: [{ name: "target", type: "address" }, { name: "callData", type: "bytes" }],
+      name: "calls",
+      type: "tuple[]"
+    }] as any, [items.map(item => ({ target: item.target, callData: item.callData }))]);
+
+    return this.getProvider().call({
+      to: network.multiCallContractAddress,
+      data,
+    }).then(result => {
+      const [blockNumber, data] = decodeParameters(['uint256', 'bytes[]'], result);
+
+      const returnData: T = {} as T;
+      data.forEach((item: string, index: number) => {
+        const value = items[index].returns(item);
+        const key: string = (items[index].key || index) as string;
         // @ts-ignore
-        data[item.key || index] = item.parser ? item.parser(value) : value;
+        returnData[key] = items[index].parser ? items[index].parser(value) : value;
       });
 
-      return {
-        blockNumber: blockNumber.toString(),
-        returnData: data,
-      };
+      return { blockNumber: blockNumber.toString(), returnData }
     });
   }
 
-  public async call<T = string>(
-    address: string,
-    abi: ethers.ContractInterface,
-    fnName: string,
-    args: any[],
-  ): Promise<T> {
-    return this.prepareContract(address, abi).callStatic[fnName](
-      ...args,
-    );
+  public async call<T = Result>(to: string, methodAndTypes: string, args: ReadonlyArray<any>, request?: Deferrable<TransactionRequest>) {
+    const { method, types, returnTypes } = prepareFunction(methodAndTypes);
+    return this.getProvider().call({
+      to,
+      data: hexConcat([functionSignature(method), encodeParameters(types, args)]),
+      ...request,
+    }).then(response => decodeParameters(returnTypes, response) as unknown as T);
   }
 
   public async send(tx: TransactionRequest) {
-    tx.from = walletService.address.toLowerCase();
-
-    if (tx.nonce === undefined) {
-      tx.nonce = await this.nonce();
-    }
-
-    if (tx.gasLimit === undefined) {
-      tx.gasLimit = await this.getNode().estimateGas(tx);
-    }
-
-    if (tx.gasPrice === undefined) {
-      tx.gasPrice = await this.getNode().getGasPrice();
-    }
-
-    tx.chainId = walletService.network;
-
+    // tx.from = walletService.address.toLowerCase();
+    //
+    // if (tx.nonce === undefined) {
+    //   tx.nonce = await this.nonce();
+    // }
+    //
+    // if (tx.gasLimit === undefined) {
+    //   tx.gasLimit = await this.getNode().estimateGas(tx);
+    // }
+    //
+    // if (tx.gasPrice === undefined) {
+    //   tx.gasPrice = await this.getNode().getGasPrice();
+    // }
+    //
+    // if (tx.to) {
+    //   tx.to = tx.to.toLowerCase();
+    // }
+    //
+    // tx.chainId = walletService.network;
+    //
     return await walletService.sendTransaction(tx);
   }
 
