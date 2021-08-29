@@ -9,7 +9,6 @@ import tokens from '../config/tokens';
 import loans from '../config/loans';
 
 const INSIDE_EVERY_PARENTHESES = /\((?:[^()]|\([^()]*\))*\)/g;
-const FIRST_CLOSING_PARENTHESES = /^[^)]*\)/;
 
 export const functionSignature = (method: string) => keccak256(method).substr(0, 10);
 

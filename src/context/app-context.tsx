@@ -62,7 +62,7 @@ export const AppContextProvider: React.FC = ({children}) => {
     // } else {
     //   setBalance('0');
     // }
-  }, [setAddress, setBalance]);
+  }, []);
 
   useEffect(() => {
     walletService.on('addressChanged', handleAddressChange);
@@ -71,7 +71,7 @@ export const AppContextProvider: React.FC = ({children}) => {
       walletService.off('addressChanged', handleAddressChange);
       walletService.off('chainChanged', handleNetworkChange);
     };
-  }, [handleAddressChange]);
+  }, [handleAddressChange, handleNetworkChange]);
 
   return (<AppContext.Provider value={{...value, setAddress, setBalance, setNetwork}}>{children}</AppContext.Provider>);
 };
