@@ -59,7 +59,14 @@ export const listLoanTokens = () => loans[getCurrentNetwork().id];
 export const getLoanToken = (token: TOKEN) => loans[getCurrentNetwork().id]
   .find(item => item.token === token) as LoanTokenType;
 
-export const toNumber = (value: number | string, decimals: number) => bignumber(value).div(10 ** 18).toFixed(decimals + 1).slice(0, -1);
+export const weiToNumber = (value: number | string, decimals: number, weiDecimals: number = 18) => bignumber(value).div(10 ** weiDecimals).toFixed(decimals + 1).slice(0, -1);
+
+export const toLocaleNumber = (value: number | string, decimals: number) => Number(value).toLocaleString(undefined, {
+  minimumFractionDigits: decimals,
+  maximumFractionDigits: decimals,
+});
+
+export const weiToLocaleNumber = (value: number | string, decimals: number) => toLocaleNumber(weiToNumber(value, decimals), decimals);
 
 export const toWei = (value: number | string, decimals: number = 18) => bignumber(value).mul(10 ** decimals).toFixed(0);
 
@@ -69,12 +76,12 @@ export const noop = () => {
 export const nFormatter = (value: number | string) => {
   value = Number(value);
   if (value >= 1000000) {
-    return (value / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    return toLocaleNumber((value / 1000000).toFixed(1), 1) + 'M';
   }
   if (value >= 1000) {
-    return (value / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+    return toLocaleNumber((value / 1000).toFixed(1), 1) + 'K';
   }
-  return value;
+  return toLocaleNumber(value, 1);
 };
 
 

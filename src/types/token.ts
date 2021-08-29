@@ -7,6 +7,7 @@ export enum TOKEN {
   BNBS,
   ETHS,
   BPRO,
+  FISH,
 }
 
 export type TokenType = {

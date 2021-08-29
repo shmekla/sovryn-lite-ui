@@ -1,22 +1,20 @@
-import { TOKEN } from 'types/token';
 import contractReader from '../contractReader';
-import { encodeFunctionData, getToken } from '../helpers';
+import { encodeFunctionData } from '../helpers';
 import walletService from '../walletService';
 
 const erc20Token = new class ERC20Token {
 
-  public allowance(token: TOKEN, spender: string) {
-    return this.call(token,'allowance(address,address)(uint256)', [walletService.address, spender])
+  public allowance(address: string, spender: string) {
+    return this.call(address,'allowance(address,address)(uint256)', [walletService.address, spender])
       .then(result => result.toString());
   }
 
-  public balanceOf(token: TOKEN, owner?: string) {
-    return this.call(token, 'balanceOf(address)(uint256)', [owner || walletService.address])
+  public balanceOf(address: string, owner?: string) {
+    return this.call(address, 'balanceOf(address)(uint256)', [owner || walletService.address])
       .then(result => result.toString());
   }
 
-  public approve(token: TOKEN, spender: string, amount: string) {
-    const { address } = getToken(token);
+  public approve(address: string, spender: string, amount: string) {
     const data = encodeFunctionData('approve(address,uint256)', [spender.toLowerCase(), amount]);
     return contractReader.send({
       to: address,
@@ -24,8 +22,7 @@ const erc20Token = new class ERC20Token {
     });
   }
 
-  public getTokenInfo(token: TOKEN) {
-    const { address } = getToken(token);
+  public getTokenInfo(address: string) {
     return contractReader.multiCall<{ decimals: string; totalSupply: string; symbol: string }>([
       {
         address,
@@ -51,8 +48,7 @@ const erc20Token = new class ERC20Token {
     ]).then(({ returnData }) => returnData);
   }
 
-  public call<T = string>(token: TOKEN, fnName: string, args: any[]) {
-    const { address } = getToken(token);
+  public call<T = string>(address: string, fnName: string, args: any[]) {
     return contractReader.call<T>(address.toLowerCase(), fnName, args);
   }
 

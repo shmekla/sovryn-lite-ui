@@ -6,26 +6,30 @@ export enum AppProviderEvents {
 
 const AppProvider = new class AppProvider extends EventBag {
 
-  private updateTimer: number = 30000; // 30 seconds
-  private lastUpdateRequest: number = new Date().getTime();
-  private requestUpdateTimeout: number = 0;
+  public readonly updateTimer: number = 30000; // 30 seconds
+  private _lastUpdateRequest: number = Date.now();
+  private _requestUpdateTimeout: number = 0;
 
   constructor() {
     super();
     this.initCounter();
   }
 
+  public get lastUpdateRequest(): number {
+    return this._lastUpdateRequest;
+  }
+
   public requestUpdate() {
-    if (this.requestUpdateTimeout) {
-      clearTimeout(this.requestUpdateTimeout);
+    if (this._requestUpdateTimeout) {
+      clearTimeout(this._requestUpdateTimeout);
     }
-    this.lastUpdateRequest = new Date().getTime();
-    this.emit(AppProviderEvents.REQUEST_UPDATE, this.lastUpdateRequest);
+    this._lastUpdateRequest = Date.now();
+    this.emit(AppProviderEvents.REQUEST_UPDATE, this._lastUpdateRequest);
     this.initCounter();
   }
 
   private initCounter() {
-    this.requestUpdateTimeout = setTimeout(() => {
+    this._requestUpdateTimeout = setTimeout(() => {
       this.requestUpdate();
     }, this.updateTimer) as unknown as number;
   }

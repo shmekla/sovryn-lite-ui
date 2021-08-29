@@ -14,13 +14,14 @@ export type LendingInfoResponse = {
   marketLiquidity: string;
   supplyInterestRate: string;
   tokenPrice: string;
+  totalSupply: string;
   totalAssetSupply: string;
   profitOf: string;
   balanceOf: string;
   assetBalanceOf: string;
   getUserAccumulatedReward: string;
+  getUserPoolTokenBalance: string;
   getUserInfo: UserInfo;
-  getUserInfoList: UserInfo[];
 };
 
 const liquidityMining = new class LiquidityMining {
@@ -55,6 +56,13 @@ const liquidityMining = new class LiquidityMining {
       },
       {
         address,
+        fnName: 'totalSupply()(uint256)',
+        args: [],
+        key: 'totalSupply',
+        parser: (value) => value[0].toString(),
+      },
+      {
+        address,
         fnName: 'totalAssetSupply()(uint256)',
         args: [],
         key: 'totalAssetSupply',
@@ -79,13 +87,6 @@ const liquidityMining = new class LiquidityMining {
         fnName: 'profitOf(address)(uint256)',
         args: [owner],
         key: 'profitOf',
-        parser: (value) => value[0].toString(),
-      },
-      {
-        address: liquidityMiningProxy,
-        fnName: 'getPoolId(address)(uint256)',
-        args: [address],
-        key: 'getPoolId',
         parser: (value) => value[0].toString(),
       },
       {
@@ -119,23 +120,19 @@ const liquidityMining = new class LiquidityMining {
         })
       },
       {
-        address: liquidityMiningProxy,
-        fnName: 'getUserInfoList(address)((uint256,uint256,uint256)[])',
-        args: [address],
-        key: 'getUserInfoList',
-        parser: (value) => value[0].map((item: any) => ({
-          amount: item[0].toString(),
-          rewardDebt: item[1].toString(),
-          accumulatedReward: item[2].toString(),
-        })),
-      },
-      {
         address,
         fnName: 'tokenPrice()(uint256)',
         args: [],
         key: 'tokenPrice',
         parser: (value) => value[0].toString(),
       },
+      {
+        address: liquidityMiningProxy,
+        fnName: 'getUserPoolTokenBalance(address,address)(uint256)',
+        args: [address, owner],
+        key: 'getUserPoolTokenBalance',
+        parser: (value) => value[0].toString(),
+      }
     ]).then(({ returnData }) => returnData);
   }
 

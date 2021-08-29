@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { listLoanTokens } from 'utils/helpers';
 import { Nullable } from 'types/nullable';
@@ -8,10 +8,12 @@ import { LendingPool } from './components/LendingPool';
 import LendDialog from './components/LendDialog';
 import AppContext from '../../../context/app-context';
 import walletService from '../../../utils/walletService';
+import UnlendDialog from './components/UnlendDialog';
+import AppProvider from '../../../utils/AppProvider';
 
 function LendPage() {
 
-  const { connected } = useContext(AppContext);
+  const { connected, address } = useContext(AppContext);
 
   const [dialogs, setDialogs] = useState<{ token: Nullable<TOKEN>; lend: boolean; unlend: boolean; }>({ token: null, lend: false, unlend: false });
 
@@ -35,6 +37,11 @@ function LendPage() {
     setDialogs(prevState => ({...prevState, token: null, lend: false, unlend: false }));
   }, []);
 
+  useEffect(() => {
+    console.log('request update');
+    AppProvider.requestUpdate();
+  }, [address]);
+
   return (
     <MainTemplate>
       <Helmet>
@@ -50,6 +57,7 @@ function LendPage() {
           </div>
 
           <LendDialog pool={dialogs.token!} isOpen={dialogs.lend} onClose={closeDialog} />
+          <UnlendDialog pool={dialogs.token!} isOpen={dialogs.unlend} onClose={closeDialog} />
         </div>
       </main>
     </MainTemplate>

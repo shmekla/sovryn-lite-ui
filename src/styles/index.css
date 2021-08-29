@@ -88,4 +88,13 @@
         transform: scale(0, 0);
         transition: opacity 300ms ease-in, transform 300ms ease-in;
     }
+
+
+    .popover {
+        @apply bg-gray-900 rounded-lg text-white;
+    }
+
+    .popover-arrow {
+        @apply bg-gray-900;
+    }
 }
