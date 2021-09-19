@@ -51,7 +51,7 @@ const walletService = new class WalletService extends EventBag {
     this.emit('connect');
     return this.provider.request({ method: 'eth_requestAccounts' }).then(async result => {
       try {
-        // this.setAddress(result[0]);
+        this.setAddress(result[0]);
         this.emit('connected', result[0]);
         return true;
       } catch (e) {

@@ -5,6 +5,7 @@
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "start": "craco start",
+    "start:mainnet": "REACT_APP_NETWORK_ID=30 craco start",
     "build": "craco build",
     "test": "craco test",
     "styleguide": "styleguidist server",

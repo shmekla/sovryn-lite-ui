@@ -4,6 +4,9 @@ import cn from 'classnames';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useRef } from 'react';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const transitionClassNames = 'overlay-enter overlay-enter-active overlay-exit overlay-exit-active dialog-enter dialog-enter-active dialog-exit dialog-exit-active';
+
 interface OverlayProps {
   children: React.ReactChild;
   usePortal?: boolean;
@@ -91,6 +94,7 @@ export function Overlay(props: OverlayProps) {
         className={cn('overlay', props.isOpen && 'overlay-open')}
         // onKeyDown={handleKeyDown}
         ref={containerRef}
+        component={null}
       >
         {childrenWithTransitions}
       </TransitionGroup>
@@ -102,28 +106,6 @@ export function Overlay(props: OverlayProps) {
   } else {
     return transitionGroup;
   }
-  // if (el) {
-  //   // todo: implement transitions.
-  //   return createPortal(
-  //     <TransitionGroup appear={true}>
-  //       {props.isOpen && <CSSTransition nodeRef={overlayRef} classNames='overlay' timeout={300} key="__backdrop"><div ref={overlayRef} className="dialog--backdrop"/></CSSTransition>}
-  //       {props.isOpen && <CSSTransition nodeRef={dialogRef} classNames='dialog' timeout={300} key="__dialog">
-  //         <div ref={dialogRef} className="dialog-wrapper">
-  //           <div className={cn('dialog--container', props.className)}>
-  //             <div className="dialog">
-  //               {props.onClose && <button className="fill-current absolute top-5 right-5" onClick={handleClose}>
-  //                 <Close/>
-  //               </button>}
-  //               {props.children}
-  //             </div>
-  //           </div>
-  //         </div></CSSTransition>}
-  //     </TransitionGroup>,
-  //     el,
-  //   );
-  // }
-  //
-  // return null;
 }
 
 Overlay.defaultProps = {

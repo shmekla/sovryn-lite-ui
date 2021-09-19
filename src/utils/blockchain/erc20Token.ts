@@ -1,5 +1,4 @@
 import contractReader from '../contractReader';
-import { encodeFunctionData } from '../helpers';
 import walletService from '../walletService';
 
 const erc20Token = new class ERC20Token {
@@ -15,11 +14,7 @@ const erc20Token = new class ERC20Token {
   }
 
   public approve(address: string, spender: string, amount: string) {
-    const data = encodeFunctionData('approve(address,uint256)', [spender.toLowerCase(), amount]);
-    return contractReader.send({
-      to: address,
-      data,
-    });
+    return contractReader.send(address, 'approve(address,uint256)', [spender.toLowerCase(), amount]);
   }
 
   public getTokenInfo(address: string) {

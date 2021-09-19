@@ -4,7 +4,9 @@
 
 @layer base {
     html, body {
-        @apply bg-black text-white;
+        @apply bg-white text-black;
+        @apply dark:bg-black dark:text-white;
+        font-family: 'Urbanist', sans-serif;
     }
 
     html.dialog-open, body.dialog-open {
@@ -19,6 +21,10 @@
     input[type=number]::-webkit-outer-spin-button {
         -webkit-appearance: none;
         margin: 0;
+    }
+
+    input[readonly] {
+        @apply cursor-not-allowed;
     }
 }
 
@@ -42,7 +48,7 @@
     }
 
     .dialog {
-        @apply bg-gray-900 my-16 px-12 py-8 rounded-xl w-full shadow-lg max-w-xl w-full mx-auto;
+        @apply bg-gray-300 dark:bg-gray-900 my-16 px-12 py-8 rounded-xl w-full shadow-lg max-w-xl w-full mx-auto;
         @apply relative;
     }
 
@@ -96,5 +102,60 @@
 
     .popover-arrow {
         @apply bg-gray-900;
+    }
+
+
+    .approval-wrapper {
+        @apply w-full max-w-xl w-full mx-auto h-0;
+        @apply absolute;
+        @apply overflow-hidden;
+        @apply bottom-0;
+        will-change: height;
+        transition: height 300ms;
+    }
+
+    .approval-wrapper--open {
+        @apply h-64;
+    }
+
+    .approval {
+        @apply bg-gray-900 my-10 rounded-xl w-full shadow-lg max-w-xl w-full mx-auto;
+        @apply absolute;
+        z-index: 10;
+        bottom: 0;
+    }
+
+    .approval-enter, .approval-appear {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+    .approval-enter-active, .approval-appear-active {
+        opacity: 1;
+        transform: translateY(0%);
+        transition: opacity 300ms ease-in, transform 300ms ease-in;
+        will-change: opacity, transform;
+    }
+    .approval-exit {
+        opacity: 1;
+        transform: translateY(0%) scaleY(1);
+    }
+    .approval-exit-active {
+        opacity: 0;
+        transform: translateY(100%);
+        transition: opacity 300ms ease-in, transform 300ms ease-in;
+        will-change: opacity, transform;
+    }
+
+    .spinner-enter, .spinner-appear {
+        opacity: 0;
+    }
+    .spinner-enter-active, .spinner-appear-active {
+        opacity: 1;
+        transition: opacity 300ms ease-in;
+        will-change: opacity;
+    }
+    .spinner-exit {
+        opacity: 1;
+        animation: ping 350ms cubic-bezier(0, 0, 0.2, 1) 0ms normal;
     }
 }

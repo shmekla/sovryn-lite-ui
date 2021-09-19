@@ -69,7 +69,7 @@ const loanToken = new class LoanToken {
         args: [address, owner],
         key: 'getUserPoolTokenBalance',
         parser: (value) => value[0].toString(),
-      }
+      },
       // {
       //   address,
       //   abi,
@@ -83,30 +83,18 @@ const loanToken = new class LoanToken {
 
   public lend(token: TOKEN, amount: string) {
     const { address, usesLm } = getLoanToken(token);
-
-    const data = token === TOKEN.RBTC
-      ? encodeFunctionData('mintWithBTC(address,bool)(uint256)', [walletService.address, usesLm])
-      : encodeFunctionData('mint(address,uint256,bool)(uint256)', [walletService.address, amount, usesLm]);
-
-    return contractReader.send({
-      to: address,
-      value: token === TOKEN.RBTC ? amount : '0',
-      data,
-    });
+    return token === TOKEN.RBTC
+      ? contractReader.send(address, 'mintWithBTC(address,bool)(uint256)', [walletService.address, usesLm], { value: amount })
+      : contractReader.send(address, 'mint(address,uint256,bool)(uint256)', [walletService.address, amount, usesLm]);
   }
 
   public unlend(token: TOKEN, amount: string, receiver?: string) {
     const { address, usesLm } = getLoanToken(token);
-
-    const data = encodeFunctionData(
+    return contractReader.send(
+      address,
       `${token === TOKEN.RBTC ? 'burnToBTC' : 'burn'}(address,uint256,bool)(uint256)`,
-      [(receiver || walletService.address).toLowerCase(), amount, usesLm]
+      [(receiver || walletService.address).toLowerCase(), amount, usesLm],
     );
-
-    return contractReader.send({
-      to: address,
-      data,
-    });
   }
 
 }();

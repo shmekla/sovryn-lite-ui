@@ -8,10 +8,12 @@ import { TOKEN } from '../../../../types/token';
 import Button from '../../../atom/Button';
 import AppProvider, { AppProviderEvents } from '../../../../utils/AppProvider';
 import classNames from 'classnames';
+import CircularProgress from '../../../atom/CircularProgress';
+import Spinner from '../../../atom/Spinner';
 
 type LendingPoolActions = {
-  onLend: (token: TOKEN) => void;
-  onUnlend: (token: TOKEN) => void;
+  onLend: (token: TOKEN, state: LendingInfoResponse) => void;
+  onUnlend: (token: TOKEN, state: LendingInfoResponse) => void;
 };
 
 export function LendingPool({ token, usesLm, onLend, onUnlend }: LoanTokenType & LendingPoolActions) {
@@ -31,6 +33,8 @@ export function LendingPool({ token, usesLm, onLend, onUnlend }: LoanTokenType &
     totalAssetSupply: '0',
     getUserAccumulatedReward: '0',
     getUserPoolTokenBalance: '0',
+    tokenBalanceOf: '0',
+    allowance: '0',
   });
   const asset = useMemo(() => getToken(token), [token]);
 
@@ -53,20 +57,23 @@ export function LendingPool({ token, usesLm, onLend, onUnlend }: LoanTokenType &
   }, [retrievePoolData]);
 
   const handleLendClick = useCallback(() => {
-    onLend(token);
-  }, [onLend, token]);
+    onLend(token, state);
+  }, [onLend, token, state]);
 
   const handleUnlendClick = useCallback(() => {
-    onUnlend(token);
-  }, [onUnlend, token]);
+    onUnlend(token, state);
+  }, [onUnlend, token, state]);
 
   const showBalance = useMemo(() => Number(state.assetBalanceOf) > 0 && owner, [state.assetBalanceOf, owner]);
 
   return (
-    <div className="bg-blue-200 bg-opacity-5 rounded-lg p-6 w-full">
+    <div className="bg-black bg-opacity-10 dark:bg-blue-200 dark:bg-opacity-5 rounded-lg p-6 w-full relative">
+      <Spinner className="absolute top-2 right-2" show={state.loading} size={16} strokeWidth={2} />
       <div className="flex flex-row justify-between items-center">
         <AddressLink address={asset.address} label={asset.symbol}/>
-        {usesLm && <span className="opacity-25 text-xs">LM rewards</span>}
+        <div className="flex flex-row justify-end items-center space-x-4">
+          {usesLm && <span className="opacity-25 text-xs">LM rewards</span>}
+        </div>
       </div>
       <div className="my-6 flex flex-row justify-between truncate">
         <div className={classNames(showBalance ? 'w-1/2' : 'w-full')}>

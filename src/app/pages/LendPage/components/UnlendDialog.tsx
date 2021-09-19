@@ -4,15 +4,16 @@ import { TOKEN } from 'types/token';
 import { Dialog } from 'app/molecule/Dialog';
 import loanToken from 'utils/blockchain/loanToken';
 import { getLoanToken, getToken, weiToLocaleNumber } from '../../../../utils/helpers';
-import Button from '../../../atom/Button';
 import { AddressLink } from '../../../atom/AddressLink';
 import liquidityMining, { LendingInfoResponse } from '../../../../utils/blockchain/liquidityMining';
 import { useWeiAmount } from '../../../hooks/useWeiAmount';
 import AppContext from '../../../../context/app-context';
 import AmountInputGroup from '../../../molecule/AmountInputGroup';
+import SubmitButton from '../../../atom/SubmitButton';
 
 type Props = {
   pool: TOKEN;
+  state: LendingInfoResponse;
   isOpen: boolean;
   onClose: () => void;
 };
@@ -93,7 +94,7 @@ function UnlendDialog(props: Props) {
               <AddressLink address={token?.address} label={<>You will receive {token?.symbol}</>}/>
             </div>
             {loading && 'Loading...'}
-            <Button text="Unlend" type="submit" disabled={weiAmount === '0' || bignumber(weiAmount).greaterThan(state.assetBalanceOf || '0')}/>
+            <SubmitButton text="Unlend" type="submit" disabled={weiAmount === '0' || bignumber(weiAmount).greaterThan(state.assetBalanceOf || '0')}/>
           </form>
         )}
       </>

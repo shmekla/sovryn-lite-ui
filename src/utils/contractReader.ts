@@ -6,7 +6,7 @@ import { getCurrentNetwork } from './network';
 import { RpcNetwork } from './rpcNetwork';
 import walletService from './walletService';
 import {
-  decodeParameters,
+  decodeParameters, encodeFunctionData,
   encodeFunctionDataWithTypes,
   encodeParameters,
   functionSignature,
@@ -15,7 +15,7 @@ import {
 import { hexConcat, Result } from 'ethers/lib/utils';
 import { BytesLike } from '@ethersproject/bytes';
 
-interface MultiCallData {
+export interface MultiCallData {
   address: string;
   fnName: string;
   args: any[];
@@ -95,28 +95,13 @@ const contractReader = new class ContractReader {
     }).then(response => decodeParameters(returnTypes, response) as unknown as T);
   }
 
-  public async send(tx: TransactionRequest) {
-    // tx.from = walletService.address.toLowerCase();
-    //
-    // if (tx.nonce === undefined) {
-    //   tx.nonce = await this.nonce();
-    // }
-    //
-    // if (tx.gasLimit === undefined) {
-    //   tx.gasLimit = await this.getNode().estimateGas(tx);
-    // }
-    //
-    // if (tx.gasPrice === undefined) {
-    //   tx.gasPrice = await this.getNode().getGasPrice();
-    // }
-    //
-    // if (tx.to) {
-    //   tx.to = tx.to.toLowerCase();
-    // }
-    //
-    // tx.chainId = walletService.network;
-    //
-    return await walletService.sendTransaction(tx);
+  public async send(to: string, methodAndTypes: string, args: ReadonlyArray<any>, request?: TransactionRequest) {
+    const data = encodeFunctionData(methodAndTypes, args);
+    return await walletService.sendTransaction({
+      to: to,
+      data,
+      ...request,
+    });
   }
 
   public async estimateGas(

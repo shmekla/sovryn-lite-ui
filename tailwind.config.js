@@ -5,7 +5,7 @@ module.exports = {
       keyframes: true,
     },
   },
-  // darkMode: 'media', // or 'media' or 'class'
+  darkMode: 'class', // or 'media' or 'class'
   theme: {
     container: {
       center: true,

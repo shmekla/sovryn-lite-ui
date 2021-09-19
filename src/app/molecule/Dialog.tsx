@@ -23,7 +23,7 @@ export function Dialog(props: DialogProps) {
       <div className="dialog-wrapper">
         <div className={cn('dialog--container', props.className)}>
           <div className="dialog">
-            {props.onClose && <button className="fill-current absolute top-2 right-2" onClick={handleClose}>
+            {props.onClose && <button type="button" className="fill-current absolute top-2 right-2" onClick={handleClose}>
               <Close/>
             </button>}
             {props.children}
