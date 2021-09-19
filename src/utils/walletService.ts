@@ -49,28 +49,56 @@ const walletService = new class WalletService extends EventBag {
 
   public connect() {
     this.emit('connect');
-    return this.provider.request({ method: 'eth_requestAccounts' }).then(async result => {
-      try {
-        this.setAddress(result[0]);
-        this.emit('connected', result[0]);
-        return true;
-      } catch (e) {
-        this.setAddress('');
-        if (e.data?.error?.code === -32601) {
+
+    if (this.provider.hasOwnProperty('request')) {
+      return this.provider.request({ method: 'eth_requestAccounts' }).then(async result => {
+        try {
+          this.setAddress(result[0]);
+          this.emit('connected', result[0]);
+          return true;
+        } catch (e) {
+          this.setAddress('');
+          if (e.data?.error?.code === -32601) {
+            return false;
+          }
+          throw e;
+        }
+      })
+        .catch(error => {
+          if (error.code === 4001) {
+            console.error('Connection rejected by user.');
+          } else {
+            console.error('Failed to connect', error);
+          }
+          this.setAddress('');
           return false;
+        });
+    } else if (this.provider.hasOwnProperty('enable')) {
+      return this.provider.enable().then(async result => {
+        try {
+          this.setAddress(result[0]);
+          this.emit('connected', result[0]);
+          return true;
+        } catch (e) {
+          this.setAddress('');
+          if (e.data?.error?.code === -32601) {
+            return false;
+          }
+          throw e;
         }
-        throw e;
-      }
-    })
-      .catch(error => {
-        if (error.code === 4001) {
-          console.error('Connection rejected by user.');
-        } else {
-          console.error('Failed to connect', error);
-        }
-        this.setAddress('');
-        return false;
-      });
+      })
+        .catch(error => {
+          if (error.code === 4001) {
+            console.error('Connection rejected by user.');
+          } else {
+            console.error('Failed to connect', error);
+          }
+          this.setAddress('');
+          return false;
+        });
+    } else {
+      return Promise.reject('Wrong provider.');
+    }
   }
 
   public disconnect() {

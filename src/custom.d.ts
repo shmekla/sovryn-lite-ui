@@ -14,6 +14,7 @@ export declare global {
     selectedAddress: string | null;
     isConnected(): boolean;
     request<T>(args: RequestArguments): Promise<Maybe<T>>;
+    enable(): Promise<string[]>;
     on(event: 'accountsChanged', handler: (accounts: string[]) => void): void;
     on(event: 'chainChanged', handler: (chainId: string) => void);
     on(event: 'message', handler: (message: any) => void);
