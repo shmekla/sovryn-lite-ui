@@ -1,6 +1,6 @@
 import { TOKEN } from 'types/token';
 import contractReader from '../contractReader';
-import { encodeFunctionData, getLoanToken } from '../helpers';
+import { getLoanToken } from '../helpers';
 import { zeroAddress } from '../constants';
 import walletService from '../walletService';
 import { getCurrentNetwork } from '../network';

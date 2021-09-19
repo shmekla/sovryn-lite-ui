@@ -8,7 +8,6 @@ import { TOKEN } from '../../../../types/token';
 import Button from '../../../atom/Button';
 import AppProvider, { AppProviderEvents } from '../../../../utils/AppProvider';
 import classNames from 'classnames';
-import CircularProgress from '../../../atom/CircularProgress';
 import Spinner from '../../../atom/Spinner';
 
 type LendingPoolActions = {

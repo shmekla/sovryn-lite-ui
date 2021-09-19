@@ -10,7 +10,6 @@ import { LendingInfoResponse } from '../../../../utils/blockchain/liquidityMinin
 import { useWeiAmount } from '../../../hooks/useWeiAmount';
 import AppContext from '../../../../context/app-context';
 import AmountInputGroup from '../../../molecule/AmountInputGroup';
-import SubmitButton from '../../../atom/SubmitButton';
 import ApproveTokenButton from '../../../molecule/ApproveTokenButton';
 
 type Props = {
