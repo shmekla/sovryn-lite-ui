@@ -49,6 +49,8 @@ const walletService = new class WalletService extends EventBag {
 
   public connect() {
     this.emit('connect');
+    console.log('PROVIDER: ', this.provider);
+    this.provider.request({ method: 'eth_requestAccounts' }).then(console.log).catch(console.warn);
 
     if (this.provider.hasOwnProperty('request')) {
       return this.provider.request({ method: 'eth_requestAccounts' }).then(async result => {

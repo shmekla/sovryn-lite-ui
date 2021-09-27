@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReactComponent as Logo } from 'assets/bitcoin-btc-logo.svg';
+import { ReactComponent as Logo } from 'assets/logo.svg';
 import HeaderNavigation from '../atom/HeaderNavigation';
 import UserWalletContainer from './UserWalletContainer';
 import RequestUpdateButton from './RequestUpdateButton';
