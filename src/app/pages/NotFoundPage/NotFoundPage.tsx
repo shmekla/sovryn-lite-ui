@@ -1,10 +1,9 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import MainTemplate from '../../template/MainTemplate';
 
 function NotFoundPage() {
   return (
-    <MainTemplate>
+    <>
       <Helmet>
         <title>Not Found</title>
       </Helmet>
@@ -14,7 +13,7 @@ function NotFoundPage() {
           <p>Page not found.</p>
         </div>
       </main>
-    </MainTemplate>
+    </>
   );
 }
 

@@ -102,8 +102,11 @@ export const toLocaleNumber = (value: number | string, decimals: number) =>
     maximumFractionDigits: decimals,
   });
 
-export const weiToLocaleNumber = (value: number | string, decimals: number) =>
-  toLocaleNumber(weiToNumber(value, decimals), decimals);
+export const weiToLocaleNumber = (
+  value: number | string,
+  decimals: number,
+  weiDecimals = 18,
+) => toLocaleNumber(weiToNumber(value, decimals, weiDecimals), decimals);
 
 export const toWei = (value: number | string, decimals = 18) =>
   bignumber(value)

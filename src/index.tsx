@@ -5,13 +5,10 @@ import ReactDOM from 'react-dom';
 import './styles/index.css';
 import reportWebVitals from './reportWebVitals';
 import App from './App';
-import LoadingScreenTemplate from './app/template/LoadingScreenTemplate';
 
 ReactDOM.render(
   <React.StrictMode>
-    <React.Suspense fallback={<LoadingScreenTemplate />}>
-      <App />
-    </React.Suspense>
+    <App />
   </React.StrictMode>,
   document.getElementById('root'),
 );

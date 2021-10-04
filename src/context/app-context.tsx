@@ -47,26 +47,29 @@ export const AppContextProvider: React.FC = ({ children }) => {
     setValue(prevState => ({ ...prevState, balance }));
   }, []);
 
-  const getBalance = useCallback(
-    async (address?: string) => {
-      if (address || value.address) {
-        const result: string = await contractReader.balance(
-          address || value.address,
-        );
+  const getBalanceUser = useCallback(
+    async (address: string) => {
+      if (address) {
+        const result: string = await contractReader.balance(address);
         setBalance(result);
       } else {
         setBalance('0');
       }
     },
-    [value.address, setBalance],
+    [setBalance],
+  );
+
+  const getBalance = useCallback(
+    () => getBalanceUser(value.address),
+    [value.address, getBalanceUser],
   );
 
   const handleAddressChange = useCallback(
     async (address: string) => {
       setAddress(address);
-      await getBalance(address);
+      await getBalanceUser(address);
     },
-    [setAddress, getBalance],
+    [setAddress, getBalanceUser],
   );
 
   const handleNetworkChange = useCallback(async (network: string) => {
@@ -84,9 +87,9 @@ export const AppContextProvider: React.FC = ({ children }) => {
 
   // todo should be somewhere else.
   useEffect(() => {
-    AppProvider.on(AppProviderEvents.REQUEST_UPDATE, () => getBalance());
+    AppProvider.on(AppProviderEvents.REQUEST_UPDATE, getBalance);
     return () => {
-      AppProvider.off(AppProviderEvents.REQUEST_UPDATE, () => getBalance());
+      AppProvider.off(AppProviderEvents.REQUEST_UPDATE, getBalance);
     };
   }, [getBalance]);
 

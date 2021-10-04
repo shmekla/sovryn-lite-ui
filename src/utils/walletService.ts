@@ -1,4 +1,5 @@
 import { TransactionRequest } from '@ethersproject/abstract-provider';
+import detectEthereumProvider from '@metamask/detect-provider';
 import log from 'loglevel';
 import { BigNumber } from 'ethers';
 import { NETWORK } from 'types/network';
@@ -16,24 +17,32 @@ const walletService = new (class WalletService extends EventBag {
     this._network = getCurrentNetwork().id;
     this._address = '';
 
-    const { ethereum, web3 } = window;
+    detectEthereumProvider()
+      .then(() => {
+        const { ethereum, web3 } = window;
 
-    if (ethereum) {
-      if (web3) {
-        log.debug('web3', web3);
-        // Overwriting injected web3 with never provider version.
-        // window.web3 = new Web3(ethereum);
-      }
+        if (ethereum) {
+          if (web3) {
+            log.debug('web3', web3);
+            // Overwriting injected web3 with never provider version.
+            // window.web3 = new Web3(ethereum);
+          }
 
-      this.setProvider(ethereum as EthereumProvider);
-    } else if (web3) {
-      if (!web3 || !web3.currentProvider || !web3.currentProvider.sendAsync) {
-        throw new Error(
-          'Web3 not found. Please check that MetaMask is installed',
-        );
-      }
-      this.setProvider(web3.currentProvider);
-    }
+          this.setProvider(ethereum as EthereumProvider);
+        } else if (web3) {
+          if (
+            !web3 ||
+            !web3.currentProvider ||
+            !web3.currentProvider.sendAsync
+          ) {
+            throw new Error(
+              'Web3 not found. Please check that MetaMask is installed',
+            );
+          }
+          this.setProvider(web3.currentProvider);
+        }
+      })
+      .catch(log.error);
   }
 
   public get address() {
@@ -48,66 +57,73 @@ const walletService = new (class WalletService extends EventBag {
     return this._network;
   }
 
-  public connect() {
+  public async connect() {
     this.emit('connect');
-    log.debug('PROVIDER: ', this.provider);
-    this.provider
-      .request({ method: 'eth_requestAccounts' })
-      .then(log.info)
-      .catch(log.error);
+    try {
+      await detectEthereumProvider();
+      this.setProvider(window.ethereum as EthereumProvider);
 
-    if (this.provider.hasOwnProperty('request')) {
-      return this.provider
+      log.debug('PROVIDER: ', this.provider);
+      this.provider
         .request({ method: 'eth_requestAccounts' })
-        .then(async result => {
-          try {
-            this.setAddress(result[0]);
-            this.emit('connected', result[0]);
-            return true;
-          } catch (e) {
-            this.setAddress('');
-            if (e.data?.error?.code === -32601) {
-              return false;
+        .then(log.info)
+        .catch(log.error);
+
+      if (this.provider.hasOwnProperty('request')) {
+        return this.provider
+          .request({ method: 'eth_requestAccounts' })
+          .then(async result => {
+            try {
+              this.setAddress(result[0]);
+              this.emit('connected', result[0]);
+              return true;
+            } catch (e) {
+              this.setAddress('');
+              if (e.data?.error?.code === -32601) {
+                return false;
+              }
+              throw e;
             }
-            throw e;
-          }
-        })
-        .catch(error => {
-          if (error.code === 4001) {
-            log.error('Connection rejected by user.');
-          } else {
-            log.error('Failed to connect', error);
-          }
-          this.setAddress('');
-          return false;
-        });
-    } else if (this.provider.hasOwnProperty('enable')) {
-      return this.provider
-        .enable()
-        .then(async result => {
-          try {
-            this.setAddress(result[0]);
-            this.emit('connected', result[0]);
-            return true;
-          } catch (e) {
-            this.setAddress('');
-            if (e.data?.error?.code === -32601) {
-              return false;
+          })
+          .catch(error => {
+            if (error.code === 4001) {
+              log.error('Connection rejected by user.');
+            } else {
+              log.error('Failed to connect', error);
             }
-            throw e;
-          }
-        })
-        .catch(error => {
-          if (error.code === 4001) {
-            log.error('Connection rejected by user.');
-          } else {
-            log.error('Failed to connect', error);
-          }
-          this.setAddress('');
-          return false;
-        });
-    } else {
-      return Promise.reject('Wrong provider.');
+            this.setAddress('');
+            return false;
+          });
+      } else if (this.provider.hasOwnProperty('enable')) {
+        return this.provider
+          .enable()
+          .then(async result => {
+            try {
+              this.setAddress(result[0]);
+              this.emit('connected', result[0]);
+              return true;
+            } catch (e) {
+              this.setAddress('');
+              if (e.data?.error?.code === -32601) {
+                return false;
+              }
+              throw e;
+            }
+          })
+          .catch(error => {
+            if (error.code === 4001) {
+              log.error('Connection rejected by user.');
+            } else {
+              log.error('Failed to connect', error);
+            }
+            this.setAddress('');
+            return false;
+          });
+      } else {
+        return Promise.reject('Wrong provider.');
+      }
+    } catch (e) {
+      return Promise.reject('No ethereum provider installed.');
     }
   }
 

@@ -1,11 +1,10 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import MainTemplate from 'app/template/MainTemplate';
 import FeatureItem from 'app/atom/FeatureItem';
 
 function HomePage() {
   return (
-    <MainTemplate>
+    <>
       <Helmet>
         <title>Homepage</title>
       </Helmet>
@@ -30,7 +29,7 @@ function HomePage() {
           </div>
         </div>
       </main>
-    </MainTemplate>
+    </>
   );
 }
 

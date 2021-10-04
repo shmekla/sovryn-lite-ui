@@ -6,6 +6,7 @@ import React, {
   useState,
 } from 'react';
 import log from 'loglevel';
+import { bignumber } from 'mathjs';
 import Button from '../atom/Button';
 import { TokenType } from '../../types/token';
 import contractReader from '../../utils/contractReader';
@@ -13,7 +14,6 @@ import AppContext from '../../context/app-context';
 import { TxHookResponse, TxStatus } from '../hooks/useSendTx';
 import { InDialogApproveModal } from './InDialogApproveModal';
 import AppProvider, { AppProviderEvents } from '../../utils/AppProvider';
-import { bignumber } from 'mathjs';
 
 type Props = {
   token: TokenType;
@@ -22,6 +22,7 @@ type Props = {
   balance?: string;
   onSubmit: () => void;
   tx: TxHookResponse;
+  valid?: boolean;
 };
 
 const TransferButton: React.FC<Props> = ({ onSubmit, token, tx, ...props }) => {
@@ -72,10 +73,12 @@ const TransferButton: React.FC<Props> = ({ onSubmit, token, tx, ...props }) => {
 
   const disabled = useMemo(
     () =>
-      bignumber(props.amount).lessThanOrEqualTo(0) ||
-      bignumber(props.amount).lessThanOrEqualTo(balance) ||
-      tx.loading,
-    [props.amount, tx.loading, balance],
+      tx.loading ||
+      (props.valid !== undefined
+        ? !props.valid
+        : bignumber(props.amount).lessThanOrEqualTo(0) ||
+          bignumber(props.amount).lessThanOrEqualTo(balance)),
+    [props.amount, tx.loading, balance, props.valid],
   );
 
   return (

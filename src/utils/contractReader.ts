@@ -147,6 +147,18 @@ const contractReader = new (class ContractReader {
     });
   }
 
+  public async sendNative(
+    to: string,
+    value: string,
+    request?: TransactionRequest,
+  ) {
+    return await walletService.sendTransaction({
+      to: to,
+      value,
+      ...request,
+    });
+  }
+
   public async estimateGas(
     address: string,
     abi: ethers.ContractInterface,

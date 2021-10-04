@@ -5,7 +5,7 @@ export enum AppProviderEvents {
 }
 
 const AppProvider = new (class AppProvider extends EventBag {
-  public readonly updateTimer: number = 30000; // 30 seconds
+  public readonly updateTimer: number = 10000; // 10 seconds
   private _lastUpdateRequest: number = Date.now();
   private _requestUpdateTimeout = 0;
 

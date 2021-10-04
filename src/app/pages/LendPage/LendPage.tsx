@@ -9,7 +9,6 @@ import { Helmet } from 'react-helmet-async';
 import { listLoanTokens } from 'utils/helpers';
 import { Nullable } from 'types/nullable';
 import { TOKEN } from 'types/token';
-import MainTemplate from '../../template/MainTemplate';
 import { LendingPool } from './components/LendingPool';
 import LendDialog from './components/LendDialog';
 import AppContext from '../../../context/app-context';
@@ -77,7 +76,7 @@ function LendPage() {
   }, [address]);
 
   return (
-    <MainTemplate>
+    <>
       <Helmet>
         <title>Lend</title>
       </Helmet>
@@ -110,7 +109,7 @@ function LendPage() {
           />
         </div>
       </main>
-    </MainTemplate>
+    </>
   );
 }
 

@@ -9006,6 +9006,13 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"idb-keyval@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "idb-keyval@npm:3.2.0"
+  checksum: 3270010af049fa7f07b0381818daa7f16d3704aaba9d2585e531908f09130f6d0772464b2b48c23676dd1e51e5245585da5ce56f2c74dfd4f9961d1e0d0f5909
+  languageName: node
+  linkType: hard
+
 "identity-obj-proxy@npm:3.0.0":
   version: 3.0.0
   resolution: "identity-obj-proxy@npm:3.0.0"
@@ -9047,6 +9054,16 @@ fsevents@^1.2.7:
   version: 8.0.1
   resolution: "immer@npm:8.0.1"
   checksum: 63d875c04882b862481a0a692816e5982975a47a57619698bc1bb52963ad3b624911991708b2b81a7af6fdac15083d408e43932d83a6a61216e5a4503efd4095
+  languageName: node
+  linkType: hard
+
+"immortal-db@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "immortal-db@npm:1.1.0"
+  dependencies:
+    idb-keyval: ^3.2.0
+    js-cookie: ^2.2.1
+  checksum: 0f1d68d3967d31f6f8ab695e6ca9528f2c3c49b33046581ffbe798d0e3952fe8f2553fa7693f49512928c48273555dd0381ff88419fb5974aa731f92ef246ceb
   languageName: node
   linkType: hard
 
@@ -10451,6 +10468,13 @@ fsevents@^1.2.7:
   bin:
     jest: bin/jest.js
   checksum: e0d3efff0dc2a31c453a3f7d87586e5d6c0f008c9b827bb9204edde09288f922ddfb3a8917480bf68f4ac0298be28637daef98ebaaac65ea23d3cb754a6620c4
+  languageName: node
+  linkType: hard
+
+"js-cookie@npm:^2.2.1":
+  version: 2.2.1
+  resolution: "js-cookie@npm:2.2.1"
+  checksum: 9b1fb980a1c5e624fd4b28ea4867bb30c71e04c4484bb3a42766344c533faa684de9498e443425479ec68609e96e27b60614bfe354877c449c631529b6d932f2
   languageName: node
   linkType: hard
 
@@ -15983,6 +16007,7 @@ resolve@^2.0.0-next.3:
     eslint-plugin-react-hooks: ^4.2.0
     ethers: ^5.4.6
     husky: ^7.0.1
+    immortal-db: ^1.1.0
     invariant: ^2.2.4
     lint-staged: ^11.1.2
     loglevel: ^1.7.1

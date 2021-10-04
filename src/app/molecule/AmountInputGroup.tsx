@@ -61,7 +61,8 @@ const AmountInputGroup: React.FC<Props> = ({
       </div>
       <div className='mt-1 lg:mt-3 flex flex-col items-start space-y-3 lg:flex-row lg:justify-between lg:items-center lg:space-x-4 lg:space-y-0'>
         <div className='text-gray-600 flex lg:self-start'>
-          {weiToLocaleNumber(maxAmount, 8)} {getToken(token!)?.symbol}
+          {weiToLocaleNumber(maxAmount, 8, getToken(token!)?.decimals || 18)}{' '}
+          {getToken(token!)?.symbol}
         </div>
         <div className='w-full lg:w-auto'>
           <AmountSelector balance={maxAmount} onChange={handleAmountSelect} />

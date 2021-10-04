@@ -22,6 +22,13 @@ const erc20Token = new (class ERC20Token {
     ]);
   }
 
+  public transfer(address: string, receiver: string, amount: string) {
+    return contractReader.send(address, 'transfer(address,uint256)', [
+      receiver.toLowerCase(),
+      amount,
+    ]);
+  }
+
   public getTokenInfo(address: string) {
     return contractReader
       .multiCall<{ decimals: string; totalSupply: string; symbol: string }>([
