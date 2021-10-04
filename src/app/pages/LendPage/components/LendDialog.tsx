@@ -90,7 +90,7 @@ const LendDialog: React.FC<Props> = props => {
             <ApproveTokenButton
               label='Lend'
               amount={weiAmount}
-              token={token.id}
+              token={token}
               spender={loan.address}
               tx={tx}
               onSubmit={handleSubmit}

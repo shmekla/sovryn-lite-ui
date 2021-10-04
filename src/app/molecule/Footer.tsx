@@ -2,7 +2,7 @@ import React from 'react';
 import socialLinks from 'config/socialLinks';
 import { ReactComponent as MailIcon } from 'assets/icons/social_mail.svg';
 import { ReactComponent as DiscordIcon } from 'assets/icons/social_discord.svg';
-import { ReactComponent as TelegramIcon } from 'assets/icons/social_telegram.svg';
+// import { ReactComponent as TelegramIcon } from 'assets/icons/social_telegram.svg';
 import { ReactComponent as TwitterIcon } from 'assets/icons/social_twitter.svg';
 import { ReactComponent as GithubIcon } from 'assets/icons/social_github.svg';
 import SocialLink from '../atom/SocialLink';
@@ -14,7 +14,7 @@ export default function Footer() {
         <nav className='text-white flex space-x-4 justify-end items-center'>
           <SocialLink href={`mailto: ${socialLinks.email}`} icon={MailIcon} />
           <SocialLink href={socialLinks.twitterUrl} icon={TwitterIcon} />
-          <SocialLink href={socialLinks.telegramInvite} icon={TelegramIcon} />
+          {/*<SocialLink href={socialLinks.telegramInvite} icon={TelegramIcon} />*/}
           <SocialLink href={socialLinks.discordInvite} icon={DiscordIcon} />
           <SocialLink href={socialLinks.githubRepository} icon={GithubIcon} />
         </nav>

@@ -22,7 +22,8 @@ import liquidityMining, {
 import { useWeiAmount } from '../../../hooks/useWeiAmount';
 import AppContext from '../../../../context/app-context';
 import AmountInputGroup from '../../../molecule/AmountInputGroup';
-import SubmitButton from '../../../atom/SubmitButton';
+import { useSendTx } from '../../../hooks/useSendTx';
+import TransferButton from '../../../molecule/TransferButton';
 
 type Props = {
   pool: TOKEN;
@@ -42,10 +43,18 @@ function UnlendDialog(props: Props) {
     getUserAccumulatedReward: '0',
     getUserPoolTokenBalance: '0',
   } as LendingInfoResponse);
-  const [loading, setLoading] = useState(false);
 
   const token = useMemo(() => getToken(props.pool), [props.pool]);
   const loan = useMemo(() => getLoanToken(props.pool), [props.pool]);
+  const tokenForUnlend = useMemo(
+    () => ({
+      ...token,
+      address: loan?.address,
+      symbol: loan?.iTokenSymbol,
+      native: true,
+    }),
+    [token, loan],
+  );
 
   const totalBalance = bignumber(state.balanceOf || '0')
     .add(state.getUserPoolTokenBalance || '0')
@@ -69,19 +78,8 @@ function UnlendDialog(props: Props) {
     [],
   );
 
-  const handleSubmit = useCallback(
-    (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      setLoading(true);
-      loanToken
-        .unlend(token.id, iTokenAmount)
-        .then(e => {
-          log.info('unlend', e, token.id, iTokenAmount);
-        })
-        .catch(e => log.error('lending', e))
-        .finally(() => setLoading(false));
-    },
-    [token, iTokenAmount],
+  const [handleSubmit, tx] = useSendTx(() =>
+    loanToken.unlend(token.id, iTokenAmount),
   );
 
   useEffect(() => {
@@ -108,7 +106,7 @@ function UnlendDialog(props: Props) {
     <Dialog isOpen={props.isOpen} onClose={props.onClose}>
       <>
         {props.isOpen && (
-          <form onSubmit={handleSubmit}>
+          <>
             <div className='flex justify-between items-center mb-2'>
               <div>Asset</div>
               <div>{token?.symbol}</div>
@@ -141,16 +139,14 @@ function UnlendDialog(props: Props) {
                 label={<>You will receive {token?.symbol}</>}
               />
             </div>
-            {loading && 'Loading...'}
-            <SubmitButton
-              text='Unlend'
-              type='submit'
-              disabled={
-                weiAmount === '0' ||
-                bignumber(weiAmount).greaterThan(state.assetBalanceOf || '0')
-              }
+            <TransferButton
+              label='Unlend'
+              onSubmit={handleSubmit}
+              token={tokenForUnlend}
+              tx={tx}
+              amount={weiAmount}
             />
-          </form>
+          </>
         )}
       </>
     </Dialog>

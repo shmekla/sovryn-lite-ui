@@ -39,6 +39,12 @@ const contractReader = new (class ContractReader {
     return this.getNode().getTransactionReceipt(transactionHash);
   }
 
+  public async balance(address: string) {
+    return this.getNode()
+      .getBalance(address)
+      .then(result => result.toString());
+  }
+
   public async multiCall<
     T = Record<string, ethers.utils.BytesLike | ethers.utils.Result | string>,
   >(callData: MultiCallData[]) {

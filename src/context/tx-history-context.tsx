@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import log from 'loglevel';
 import walletService from '../utils/walletService';
 import { NETWORK } from '../types/network';
+import contractReader from '../utils/contractReader';
 
 type AppContextType = {
   address: string;
@@ -49,10 +50,7 @@ export const TxHistoryContextProvider: React.FC = ({ children }) => {
     async (address: string) => {
       setAddress(address);
       if (address) {
-        const result: string = await walletService.provider.request({
-          method: 'eth_getBalance',
-          params: [address, 'latest'],
-        });
+        const result: string = await contractReader.balance(address);
         setBalance(Number(result).toString());
       } else {
         setBalance('0');
@@ -63,13 +61,6 @@ export const TxHistoryContextProvider: React.FC = ({ children }) => {
 
   const handleNetworkChange = useCallback(async (network: string) => {
     log.info('handle network change', network);
-    // setAddress(address);
-    // if (address) {
-    //   const result: string = await walletService.provider.request({ method: 'eth_getBalance', params: [address, 'latest' ]});
-    //   setBalance(Number(result).toString());
-    // } else {
-    //   setBalance('0');
-    // }
   }, []);
 
   useEffect(() => {

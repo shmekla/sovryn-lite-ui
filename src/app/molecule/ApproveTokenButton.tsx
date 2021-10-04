@@ -8,8 +8,8 @@ import React, {
 import { bignumber } from 'mathjs';
 import log from 'loglevel';
 import Button from '../atom/Button';
-import { TOKEN } from '../../types/token';
-import { getToken, weiToNumber } from '../../utils/helpers';
+import { TokenType } from '../../types/token';
+import { weiToNumber } from '../../utils/helpers';
 import contractReader, { MultiCallData } from '../../utils/contractReader';
 import AppContext from '../../context/app-context';
 import { AddressLink } from '../atom/AddressLink';
@@ -24,7 +24,7 @@ import AppProvider, { AppProviderEvents } from '../../utils/AppProvider';
 const UNLIMITED_AMOUNT = '10000000';
 
 type Props = {
-  token: TOKEN;
+  token: TokenType;
   spender: string;
   amount: string;
   label?: React.ReactNode;
@@ -43,7 +43,7 @@ const ApproveTokenButton: React.FC<Props> = ({
   ...props
 }) => {
   const { address: owner } = useContext(AppContext);
-  const { symbol, address, decimals, native } = getToken(token);
+  const { symbol, address, decimals, native } = token;
   const [state, setState] = useState({
     balance: props.balance,
     allowance: props.allowance,
