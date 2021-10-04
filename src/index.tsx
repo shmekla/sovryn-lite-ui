@@ -1,21 +1,19 @@
-// import 'react-app-polyfill/stable';
+import 'react-app-polyfill/stable';
+import './setup-logger';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './styles/index.css';
 import reportWebVitals from './reportWebVitals';
 import App from './App';
-import LoadingScreenTemplate from './app/template/LoadingScreenTemplate';
 
 ReactDOM.render(
   <React.StrictMode>
-    <React.Suspense fallback={<LoadingScreenTemplate />}>
-      <App />
-    </React.Suspense>
+    <App />
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById('root'),
 );
 
 // If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
+// to log results (for example: reportWebVitals(log.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();

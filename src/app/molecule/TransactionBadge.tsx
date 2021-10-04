@@ -6,5 +6,5 @@ type TransactionBadgeProps = {
 };
 
 export function TransactionBadge({ tx }: TransactionBadgeProps) {
-  return (<TransactionLink tx={tx} />);
+  return <TransactionLink tx={tx} />;
 }

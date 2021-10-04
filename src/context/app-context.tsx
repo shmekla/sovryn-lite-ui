@@ -1,12 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import log from 'loglevel';
 import walletService from '../utils/walletService';
 import { NETWORK } from '../types/network';
+import AppProvider, { AppProviderEvents } from '../utils/AppProvider';
+import contractReader from '../utils/contractReader';
 
 type AppContextType = {
   address: string;
   balance: string;
   connected: boolean;
-  network: NETWORK,
+  network: NETWORK;
 };
 
 type AppContextActionType = {
@@ -22,46 +25,55 @@ const defaultValue: AppContextType = {
   network: NETWORK.RSK,
 };
 
-const AppContext = React.createContext<AppContextType & Partial<AppContextActionType>>(defaultValue);
+const AppContext = React.createContext<
+  AppContextType & Partial<AppContextActionType>
+>(defaultValue);
 
-export const AppContextProvider: React.FC = ({children}) => {
-
+export const AppContextProvider: React.FC = ({ children }) => {
   const [value, setValue] = useState<AppContextType>(defaultValue);
 
   const setAddress = useCallback((address: string) => {
-    console.log('address changed', address);
-    setValue(prevState => ({...prevState, address, connected: !!address }));
+    log.info('address changed', address);
+    setValue(prevState => ({ ...prevState, address, connected: !!address }));
   }, []);
 
   const setNetwork = useCallback((network: NETWORK) => {
-    console.log('network changed', network);
-    setValue(prevState => ({...prevState, network}));
+    log.info('network changed', network);
+    setValue(prevState => ({ ...prevState, network }));
   }, []);
 
   const setBalance = useCallback((balance: string) => {
-    console.log('balance changed', balance);
-    setValue(prevState => ({...prevState, balance}));
+    log.info('balance changed', balance);
+    setValue(prevState => ({ ...prevState, balance }));
   }, []);
 
-  const handleAddressChange = useCallback(async (address: string) => {
-    setAddress(address);
-    if (address) {
-      const result: string = await walletService.provider.request({ method: 'eth_getBalance', params: [address, 'latest' ]});
-      setBalance(Number(result).toString());
-    } else {
-      setBalance('0');
-    }
-  }, [setAddress, setBalance]);
+  const getBalanceUser = useCallback(
+    async (address: string) => {
+      if (address) {
+        const result: string = await contractReader.balance(address);
+        setBalance(result);
+      } else {
+        setBalance('0');
+      }
+    },
+    [setBalance],
+  );
+
+  const getBalance = useCallback(
+    () => getBalanceUser(value.address),
+    [value.address, getBalanceUser],
+  );
+
+  const handleAddressChange = useCallback(
+    async (address: string) => {
+      setAddress(address);
+      await getBalanceUser(address);
+    },
+    [setAddress, getBalanceUser],
+  );
 
   const handleNetworkChange = useCallback(async (network: string) => {
-    console.log('handle network change', network);
-    // setAddress(address);
-    // if (address) {
-    //   const result: string = await walletService.provider.request({ method: 'eth_getBalance', params: [address, 'latest' ]});
-    //   setBalance(Number(result).toString());
-    // } else {
-    //   setBalance('0');
-    // }
+    log.info('handle network change', network);
   }, []);
 
   useEffect(() => {
@@ -73,7 +85,21 @@ export const AppContextProvider: React.FC = ({children}) => {
     };
   }, [handleAddressChange, handleNetworkChange]);
 
-  return (<AppContext.Provider value={{...value, setAddress, setBalance, setNetwork}}>{children}</AppContext.Provider>);
+  // todo should be somewhere else.
+  useEffect(() => {
+    AppProvider.on(AppProviderEvents.REQUEST_UPDATE, getBalance);
+    return () => {
+      AppProvider.off(AppProviderEvents.REQUEST_UPDATE, getBalance);
+    };
+  }, [getBalance]);
+
+  return (
+    <AppContext.Provider
+      value={{ ...value, setAddress, setBalance, setNetwork }}
+    >
+      {children}
+    </AppContext.Provider>
+  );
 };
 
 export default AppContext;

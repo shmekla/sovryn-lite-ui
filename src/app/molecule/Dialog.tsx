@@ -11,7 +11,6 @@ interface DialogProps {
 }
 
 export function Dialog(props: DialogProps) {
-
   const handleClose = useCallback(() => {
     if (props.onClose) {
       props.onClose();
@@ -20,12 +19,18 @@ export function Dialog(props: DialogProps) {
 
   return (
     <Overlay isOpen={props.isOpen}>
-      <div className="dialog-wrapper">
+      <div className='dialog-wrapper'>
         <div className={cn('dialog--container', props.className)}>
-          <div className="dialog">
-            {props.onClose && <button type="button" className="fill-current absolute top-2 right-2" onClick={handleClose}>
-              <Close/>
-            </button>}
+          <div className='dialog'>
+            {props.onClose && (
+              <button
+                type='button'
+                className='fill-current absolute top-2 right-2'
+                onClick={handleClose}
+              >
+                <Close />
+              </button>
+            )}
             {props.children}
           </div>
         </div>

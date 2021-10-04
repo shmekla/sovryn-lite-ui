@@ -1,19 +1,21 @@
 import { ethers } from 'ethers';
 import type { TransactionRequest } from '@ethersproject/abstract-provider';
 import type { Deferrable } from '@ethersproject/properties';
+import type { BytesLike } from '@ethersproject/bytes';
+import { hexConcat, Result } from 'ethers/lib/utils';
+import log from 'loglevel';
 import { NETWORK } from 'types/network';
 import { getCurrentNetwork } from './network';
 import { RpcNetwork } from './rpcNetwork';
 import walletService from './walletService';
 import {
-  decodeParameters, encodeFunctionData,
+  decodeParameters,
+  encodeFunctionData,
   encodeFunctionDataWithTypes,
   encodeParameters,
   functionSignature,
   prepareFunction,
 } from './helpers';
-import { hexConcat, Result } from 'ethers/lib/utils';
-import { BytesLike } from '@ethersproject/bytes';
 
 export interface MultiCallData {
   address: string;
@@ -23,9 +25,9 @@ export interface MultiCallData {
   parser?: (val: any) => any;
 }
 
-const contractReader = new class ContractReader {
-  public readonly contracts: Map<NETWORK, Map<string, ethers.Contract>> = new Map<NETWORK,
-    Map<string, ethers.Contract>>();
+const contractReader = new (class ContractReader {
+  public readonly contracts: Map<NETWORK, Map<string, ethers.Contract>> =
+    new Map<NETWORK, Map<string, ethers.Contract>>();
 
   public async nonce() {
     return this.getNode().getTransactionCount(
@@ -34,13 +36,18 @@ const contractReader = new class ContractReader {
   }
 
   public async receipt(transactionHash: string) {
-    return this.getNode()
-      .getTransactionReceipt(transactionHash)
-      .catch(e => console.error(e, transactionHash));
+    return this.getNode().getTransactionReceipt(transactionHash);
   }
 
-  public async multiCall<T = { [key: string]: string }>(callData: MultiCallData[]) {
+  public async balance(address: string) {
+    return this.getNode()
+      .getBalance(address)
+      .then(result => result.toString());
+  }
 
+  public async multiCall<
+    T = Record<string, ethers.utils.BytesLike | ethers.utils.Result | string>,
+  >(callData: MultiCallData[]) {
     const network = getCurrentNetwork();
 
     const items = callData.map(item => {
@@ -50,10 +57,10 @@ const contractReader = new class ContractReader {
         callData: encodeFunctionDataWithTypes(method, types, item.args),
         returns: (data: BytesLike) => {
           try {
-            return decodeParameters(returnTypes, data)
+            return decodeParameters(returnTypes, data);
           } catch (e) {
-            console.error('decodeParameters::', method, types, returnTypes, data);
-            console.error(e);
+            log.error('decodeParameters::', method, types, returnTypes, data);
+            log.error(e);
             return data;
           }
         },
@@ -62,44 +69,92 @@ const contractReader = new class ContractReader {
       };
     });
 
-    const data = encodeFunctionDataWithTypes('aggregate((address,bytes)[])', [{
-      components: [{ name: "target", type: "address" }, { name: "callData", type: "bytes" }],
-      name: "calls",
-      type: "tuple[]"
-    }] as any, [items.map(item => ({ target: item.target, callData: item.callData }))]);
+    const data = encodeFunctionDataWithTypes(
+      'aggregate((address,bytes)[])',
+      [
+        {
+          components: [
+            { name: 'target', type: 'address' },
+            { name: 'callData', type: 'bytes' },
+          ],
+          name: 'calls',
+          type: 'tuple[]',
+        },
+      ] as any,
+      [items.map(item => ({ target: item.target, callData: item.callData }))],
+    );
 
-    return this.getProvider().call({
-      to: network.multiCallContractAddress,
-      data,
-    }).then(result => {
-      const [blockNumber, data] = decodeParameters(['uint256', 'bytes[]'], result);
+    return this.getProvider()
+      .call({
+        to: network.multiCallContractAddress,
+        data,
+      })
+      .then(result => {
+        const [blockNumber, data] = decodeParameters(
+          ['uint256', 'bytes[]'],
+          result,
+        );
 
-      const returnData: T = {} as T;
-      data.forEach((item: string, index: number) => {
-        const value = items[index].returns(item);
-        const key: string = (items[index].key || index) as string;
-        // @ts-ignore
-        returnData[key] = items[index].parser ? items[index].parser(value) : value;
+        const returnData: T = {} as T;
+        data.forEach((item: string, index: number) => {
+          const value = items[index].returns(item);
+          const key: string = (items[index].key || index) as string;
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          returnData[key] = items[index].parser
+            ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              items[index]?.parser(value)
+            : value;
+        });
+
+        return { blockNumber: blockNumber.toString(), returnData };
       });
-
-      return { blockNumber: blockNumber.toString(), returnData }
-    });
   }
 
-  public async call<T = Result>(to: string, methodAndTypes: string, args: ReadonlyArray<any>, request?: Deferrable<TransactionRequest>) {
+  public async call<T = Result>(
+    to: string,
+    methodAndTypes: string,
+    args: ReadonlyArray<any>,
+    request?: Deferrable<TransactionRequest>,
+  ) {
     const { method, types, returnTypes } = prepareFunction(methodAndTypes);
-    return this.getProvider().call({
-      to,
-      data: hexConcat([functionSignature(method), encodeParameters(types, args)]),
-      ...request,
-    }).then(response => decodeParameters(returnTypes, response) as unknown as T);
+    return this.getProvider()
+      .call({
+        to,
+        data: hexConcat([
+          functionSignature(method),
+          encodeParameters(types, args),
+        ]),
+        ...request,
+      })
+      .then(
+        response => decodeParameters(returnTypes, response) as unknown as T,
+      );
   }
 
-  public async send(to: string, methodAndTypes: string, args: ReadonlyArray<any>, request?: TransactionRequest) {
+  public async send(
+    to: string,
+    methodAndTypes: string,
+    args: ReadonlyArray<any>,
+    request?: TransactionRequest,
+  ) {
     const data = encodeFunctionData(methodAndTypes, args);
     return await walletService.sendTransaction({
       to: to,
       data,
+      ...request,
+    });
+  }
+
+  public async sendNative(
+    to: string,
+    value: string,
+    request?: TransactionRequest,
+  ) {
+    return await walletService.sendTransaction({
+      to: to,
+      value,
       ...request,
     });
   }
@@ -110,9 +165,7 @@ const contractReader = new class ContractReader {
     fnName: string,
     args: any[],
   ) {
-    return this.prepareContract(address, abi).estimateGas[fnName](
-      ...args,
-    );
+    return this.prepareContract(address, abi).estimateGas[fnName](...args);
   }
 
   public encodeFunctionData(
@@ -121,10 +174,10 @@ const contractReader = new class ContractReader {
     fnName: string,
     args: any[],
   ) {
-    return this.prepareContract(
-      address,
-      abi,
-    ).interface.encodeFunctionData(fnName, args);
+    return this.prepareContract(address, abi).interface.encodeFunctionData(
+      fnName,
+      args,
+    );
   }
 
   public decodeFunctionResult(
@@ -133,10 +186,10 @@ const contractReader = new class ContractReader {
     fnName: string,
     data: ethers.utils.BytesLike,
   ) {
-    return this.prepareContract(
-      address,
-      abi,
-    ).interface.decodeFunctionResult(fnName, data);
+    return this.prepareContract(address, abi).interface.decodeFunctionResult(
+      fnName,
+      data,
+    );
   }
 
   public getNode() {
@@ -147,10 +200,7 @@ const contractReader = new class ContractReader {
     return this.getNode().provider;
   }
 
-  public prepareContract(
-    address: string,
-    abi: ethers.ContractInterface,
-  ) {
+  public prepareContract(address: string, abi: ethers.ContractInterface) {
     const chain = getCurrentNetwork().id;
     address = address.toLowerCase();
     if (!this.contracts.has(chain)) {
@@ -160,17 +210,13 @@ const contractReader = new class ContractReader {
     const contracts = this.contracts.get(chain) as Map<string, ethers.Contract>;
 
     if (!contracts.has(address)) {
-      const contract = new ethers.Contract(
-        address,
-        abi,
-        this.getProvider(),
-      );
+      const contract = new ethers.Contract(address, abi, this.getProvider());
       contracts.set(chain as unknown as string, contract);
       return contract;
     }
 
     return contracts.get(address) as ethers.Contract;
   }
-}();
+})();
 
 export default contractReader;
