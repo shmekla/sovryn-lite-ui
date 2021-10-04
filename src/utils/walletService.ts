@@ -1,13 +1,14 @@
 import { TransactionRequest } from '@ethersproject/abstract-provider';
+import log from 'loglevel';
+import { BigNumber } from 'ethers';
 import { NETWORK } from 'types/network';
 import { EventBag } from './eventBag';
 import { getCurrentNetwork, getNetwork } from './network';
-import { BigNumber } from 'ethers';
 
-const walletService = new class WalletService extends EventBag {
+const walletService = new (class WalletService extends EventBag {
   private _network: NETWORK;
   private _address: string;
-  private _provider!: InPageProvider;
+  private _provider!: EthereumProvider;
 
   constructor() {
     super();
@@ -19,12 +20,12 @@ const walletService = new class WalletService extends EventBag {
 
     if (ethereum) {
       if (web3) {
-        console.log('web3', web3);
+        log.debug('web3', web3);
         // Overwriting injected web3 with never provider version.
         // window.web3 = new Web3(ethereum);
       }
 
-      this.setProvider(ethereum);
+      this.setProvider(ethereum as EthereumProvider);
     } else if (web3) {
       if (!web3 || !web3.currentProvider || !web3.currentProvider.sendAsync) {
         throw new Error(
@@ -49,51 +50,58 @@ const walletService = new class WalletService extends EventBag {
 
   public connect() {
     this.emit('connect');
-    console.log('PROVIDER: ', this.provider);
-    this.provider.request({ method: 'eth_requestAccounts' }).then(console.log).catch(console.warn);
+    log.debug('PROVIDER: ', this.provider);
+    this.provider
+      .request({ method: 'eth_requestAccounts' })
+      .then(log.info)
+      .catch(log.error);
 
     if (this.provider.hasOwnProperty('request')) {
-      return this.provider.request({ method: 'eth_requestAccounts' }).then(async result => {
-        try {
-          this.setAddress(result[0]);
-          this.emit('connected', result[0]);
-          return true;
-        } catch (e) {
-          this.setAddress('');
-          if (e.data?.error?.code === -32601) {
-            return false;
+      return this.provider
+        .request({ method: 'eth_requestAccounts' })
+        .then(async result => {
+          try {
+            this.setAddress(result[0]);
+            this.emit('connected', result[0]);
+            return true;
+          } catch (e) {
+            this.setAddress('');
+            if (e.data?.error?.code === -32601) {
+              return false;
+            }
+            throw e;
           }
-          throw e;
-        }
-      })
+        })
         .catch(error => {
           if (error.code === 4001) {
-            console.error('Connection rejected by user.');
+            log.error('Connection rejected by user.');
           } else {
-            console.error('Failed to connect', error);
+            log.error('Failed to connect', error);
           }
           this.setAddress('');
           return false;
         });
     } else if (this.provider.hasOwnProperty('enable')) {
-      return this.provider.enable().then(async result => {
-        try {
-          this.setAddress(result[0]);
-          this.emit('connected', result[0]);
-          return true;
-        } catch (e) {
-          this.setAddress('');
-          if (e.data?.error?.code === -32601) {
-            return false;
+      return this.provider
+        .enable()
+        .then(async result => {
+          try {
+            this.setAddress(result[0]);
+            this.emit('connected', result[0]);
+            return true;
+          } catch (e) {
+            this.setAddress('');
+            if (e.data?.error?.code === -32601) {
+              return false;
+            }
+            throw e;
           }
-          throw e;
-        }
-      })
+        })
         .catch(error => {
           if (error.code === 4001) {
-            console.error('Connection rejected by user.');
+            log.error('Connection rejected by user.');
           } else {
-            console.error('Failed to connect', error);
+            log.error('Failed to connect', error);
           }
           this.setAddress('');
           return false;
@@ -112,15 +120,18 @@ const walletService = new class WalletService extends EventBag {
     this.emit('addressChanged', this._address);
   }
 
-  public setProvider(provider: InPageProvider) {
+  public setProvider(provider: EthereumProvider) {
     this._provider = provider;
     this.emit('providerChanged', this._provider);
 
-    this.provider.on('accountsChanged', accounts => this.setAddress(accounts[0] || ''));
+    this.provider.on('accountsChanged', accounts =>
+      this.setAddress(accounts[0] || ''),
+    );
     this.provider.on('chainChanged', chainId => {
-      this._network = getNetwork(chainId as unknown as NETWORK)?.id || NETWORK.UNKNOWN;
+      this._network =
+        getNetwork(chainId as unknown as NETWORK)?.id || NETWORK.UNKNOWN;
       this.emit('chainChanged', Number(chainId));
-      this.connect().catch(console.error);
+      this.connect().catch(log.error);
     });
   }
 
@@ -143,16 +154,13 @@ const walletService = new class WalletService extends EventBag {
     //   });
     // }
 
-    console.log('tx', tx);
+    log.debug('tx', tx);
 
     return this.provider.request({
       method: 'eth_sendTransaction',
       params: [tx],
     });
   }
-
-}();
+})();
 
 export default walletService;
-
-

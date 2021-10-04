@@ -3,19 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "start": "craco start",
-    "start:mainnet": "REACT_APP_NETWORK_ID=30 craco start",
-    "build": "craco build",
-    "test": "craco test",
-    "styleguide": "styleguidist server",
-    "styleguide:build": "styleguidist build"
+    "analyze": "yarn source-map-explorer 'build/static/js/*.js'",
+    "start": "yarn craco start",
+    "start:mainnet": "REACT_APP_NETWORK_ID=30 yarn craco start",
+    "build": "yarn craco build",
+    "test": "yarn craco test",
+    "styleguide": "yarn styleguidist server",
+    "styleguide:build": "yarn styleguidist build"
   },
   "engines": {
     "node": ">=14"
   },
   "dependencies": {
     "@craco/craco": "^6.2.0",
+    "@metamask/detect-provider": "^1.2.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -28,6 +29,7 @@
     "husky": "^7.0.1",
     "invariant": "^2.2.4",
     "lint-staged": "^11.1.2",
+    "loglevel": "^1.7.1",
     "mathjs": "^9.4.4",
     "prettier": "^2.3.2",
     "react": "^17.0.2",
@@ -37,11 +39,11 @@
     "react-router-dom": "^5.3.0",
     "react-scripts": "4.0.3",
     "react-styleguidist": "^11.1.7",
-    "react-tiny-popover": "^7.0.0",
+    "react-tiny-popover": "^7.0.1",
     "react-transition-group": "^4.4.2",
     "reactour": "^1.18.6",
     "source-map-explorer": "^2.5.2",
-    "typescript": "^4.1.2",
+    "typescript": "^4.4.3",
     "web-vitals": "^1.0.1"
   },
   "devDependencies": {
@@ -49,19 +51,21 @@
     "@types/mathjs": "^9.4.2",
     "@types/react-router-dom": "^5.1.8",
     "@types/react-transition-group": "^4.4.2",
+    "@typescript-eslint/eslint-plugin": "^4.32.0",
+    "@typescript-eslint/parser": "^4.32.0",
+    "@vercel/node": "^1.12.1",
     "autoprefixer": "^9",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.26.1",
+    "eslint-plugin-react-hooks": "^4.2.0",
     "postcss": "^7",
-    "tailwindcss": "npm:@tailwindcss/postcss7-compat"
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.16"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
       "prettier --write"
-    ]
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
     ]
   },
   "browserslist": [

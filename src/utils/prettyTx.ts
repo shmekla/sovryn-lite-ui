@@ -1,9 +1,9 @@
 export const prettyTx = (
   text: string,
-  startLength: number = 6,
-  endLength: number = 4,
-) => {
+  startLength = 6,
+  endLength = 3,
+): string => {
   const start = text.substr(0, startLength);
   const end = text.substr(-endLength);
-  return `${start} ··· ${end}`;
+  return `${start}...${end}`;
 };

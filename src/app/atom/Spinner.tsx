@@ -11,15 +11,31 @@ type SpinnerProps = {
   transitionMs?: number;
 };
 
-const Spinner: React.FC<SpinnerProps> = ({ className, show, size, strokeWidth, transitionMs }) => {
+const Spinner: React.FC<SpinnerProps> = ({
+  className,
+  show,
+  size,
+  strokeWidth,
+  transitionMs,
+}) => {
   const ref = useRef<HTMLDivElement>(null!);
   return (
     <TransitionGroup appear={true} component={null}>
       {show && (
-        <CSSTransition key="spinner" nodeRef={ref} timeout={300} classNames="spinner">
+        <CSSTransition
+          key='spinner'
+          nodeRef={ref}
+          timeout={300}
+          classNames='spinner'
+        >
           <div className={cn(className)} ref={ref}>
-            <div className="animate-spin">
-              <CircularProgress progress={50} size={size} strokeWidth={strokeWidth} transitionMs={transitionMs}/>
+            <div className='animate-spin'>
+              <CircularProgress
+                progress={50}
+                size={size}
+                strokeWidth={strokeWidth}
+                transitionMs={transitionMs}
+              />
             </div>
           </div>
         </CSSTransition>

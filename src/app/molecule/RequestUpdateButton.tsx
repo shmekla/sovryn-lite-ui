@@ -5,15 +5,23 @@ import { useCountdown } from '../hooks/useCountdown';
 import Popover from '../atom/Popover';
 
 const RequestUpdateButton: React.FC = () => {
+  const [nextUpdate, setNextUpdate] = useState(
+    AppProvider.lastUpdateRequest + AppProvider.updateTimer,
+  );
 
-  const [nextUpdate, setNextUpdate]  = useState(AppProvider.lastUpdateRequest + AppProvider.updateTimer);
-
-  const updateCountdown = useCallback(() => setNextUpdate(AppProvider.lastUpdateRequest + AppProvider.updateTimer), [setNextUpdate]);
+  const updateCountdown = useCallback(
+    () =>
+      setNextUpdate(AppProvider.lastUpdateRequest + AppProvider.updateTimer),
+    [setNextUpdate],
+  );
 
   const forceRefresh = useCallback(() => AppProvider.requestUpdate(), []);
 
   const timer = useCountdown(nextUpdate, 500);
-  const progress = useMemo(() => 100 - timer / AppProvider.updateTimer * 100, [timer]);
+  const progress = useMemo(
+    () => 100 - (timer / AppProvider.updateTimer) * 100,
+    [timer],
+  );
 
   useEffect(() => {
     AppProvider.on(AppProviderEvents.REQUEST_UPDATE, updateCountdown);
@@ -23,13 +31,12 @@ const RequestUpdateButton: React.FC = () => {
   }, [updateCountdown]);
 
   return (
-    <Popover content={'Test'}>
+    <Popover content='Fetch data from the blockchain.'>
       <button onClick={forceRefresh}>
         <CircularProgress progress={progress} transitionMs={500} />
       </button>
     </Popover>
   );
 };
-
 
 export default RequestUpdateButton;

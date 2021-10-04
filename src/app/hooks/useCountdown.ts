@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-export function useCountdown(endTime: number, delay: number = 1000) {
-
+export function useCountdown(endTime: number, delay = 1000): number {
   const getTimeLeft = useCallback(() => {
     const time = endTime - Date.now();
     return time > 0 ? time : 0;
@@ -11,12 +10,15 @@ export function useCountdown(endTime: number, delay: number = 1000) {
 
   useEffect(() => {
     setTimeLeft(getTimeLeft());
-    const intervalRef: NodeJS.Timeout = setInterval(() => setTimeLeft(getTimeLeft()), delay);
+    const intervalRef: NodeJS.Timeout = setInterval(
+      () => setTimeLeft(getTimeLeft()),
+      delay,
+    );
     return () => {
       if (intervalRef) {
         clearInterval(intervalRef);
       }
-    }
+    };
   }, [endTime, delay, getTimeLeft]);
 
   return timeLeft;

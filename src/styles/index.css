@@ -24,7 +24,7 @@
     }
 
     input[readonly] {
-        @apply cursor-not-allowed;
+        @apply cursor-not-allowed opacity-25;
     }
 }
 
@@ -97,7 +97,7 @@
 
 
     .popover {
-        @apply bg-gray-900 rounded-lg text-white;
+        @apply bg-gray-900 rounded-lg text-white px-3 py-1;
     }
 
     .popover-arrow {

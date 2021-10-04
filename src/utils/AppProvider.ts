@@ -4,11 +4,10 @@ export enum AppProviderEvents {
   REQUEST_UPDATE = 'update_request',
 }
 
-const AppProvider = new class AppProvider extends EventBag {
-
+const AppProvider = new (class AppProvider extends EventBag {
   public readonly updateTimer: number = 30000; // 30 seconds
   private _lastUpdateRequest: number = Date.now();
-  private _requestUpdateTimeout: number = 0;
+  private _requestUpdateTimeout = 0;
 
   constructor() {
     super();
@@ -33,6 +32,6 @@ const AppProvider = new class AppProvider extends EventBag {
       this.requestUpdate();
     }, this.updateTimer) as unknown as number;
   }
-}();
+})();
 
 export default AppProvider;

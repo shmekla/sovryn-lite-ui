@@ -1,7 +1,11 @@
+import type { log } from 'loglevel';
+
 export declare global {
   declare interface Window {
-    ethereum?: InPageProvider;
+    ethereum?: EthereumProvider;
+    NativeApp?: boolean;
     web3?: any;
+    log?: log;
   }
 
   export interface RequestArguments {
@@ -9,9 +13,10 @@ export declare global {
     params?: unknown[] | Record<string, unknown>;
   }
 
-  declare interface InPageProvider {
+  declare interface EthereumProvider {
     chainId: string | null;
     selectedAddress: string | null;
+    isMetaMask?: boolean;
     isConnected(): boolean;
     request<T>(args: RequestArguments): Promise<Maybe<T>>;
     enable(): Promise<string[]>;

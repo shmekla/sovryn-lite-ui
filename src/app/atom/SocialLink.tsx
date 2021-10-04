@@ -7,8 +7,9 @@ type SocialLinkProps = {
 
 const SocialLink: React.FC<SocialLinkProps> = ({ href, icon: Icon }) => {
   return (
-    <a href={href} target="_blank" rel="noreferrer nofollow"><Icon
-      className="fill-current hover:opacity-75 transition duration-300"/></a>
+    <a href={href} target='_blank' rel='noreferrer nofollow'>
+      <Icon className='fill-current hover:opacity-75 transition duration-300' />
+    </a>
   );
 };
 

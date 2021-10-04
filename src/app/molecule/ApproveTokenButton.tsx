@@ -1,7 +1,12 @@
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import cn from 'classnames';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { bignumber } from 'mathjs';
+import log from 'loglevel';
 import Button from '../atom/Button';
 import { TOKEN } from '../../types/token';
 import { getToken, weiToNumber } from '../../utils/helpers';
@@ -9,9 +14,12 @@ import contractReader, { MultiCallData } from '../../utils/contractReader';
 import AppContext from '../../context/app-context';
 import { AddressLink } from '../atom/AddressLink';
 import Input from '../atom/Input';
-import { ReactComponent as Close } from '../../assets/icons/close.svg';
 import { useWeiAmount } from '../hooks/useWeiAmount';
 import erc20Token from '../../utils/blockchain/erc20Token';
+import { TxHookResponse, TxStatus, useSendTx } from '../hooks/useSendTx';
+import { InDialogApproveModal } from './InDialogApproveModal';
+import Popover from '../atom/Popover';
+import AppProvider, { AppProviderEvents } from '../../utils/AppProvider';
 
 const UNLIMITED_AMOUNT = '10000000';
 
@@ -23,27 +31,42 @@ type Props = {
   allowance?: string;
   balance?: string;
   onSubmit: () => void;
+  tx?: TxHookResponse;
 };
 
-const ApproveTokenButton: React.FC<Props> = ({ onSubmit, token, spender, ...props }) => {
-
+// todo clean up it a little bit by splitting to smaller components
+const ApproveTokenButton: React.FC<Props> = ({
+  onSubmit,
+  token,
+  spender,
+  tx,
+  ...props
+}) => {
   const { address: owner } = useContext(AppContext);
   const { symbol, address, decimals, native } = getToken(token);
-  const [state, setState] = useState({ balance: props.balance, allowance: props.allowance });
+  const [state, setState] = useState({
+    balance: props.balance,
+    allowance: props.allowance,
+  });
+  const [inApprove, setInApprove] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const [form, setForm] = useState({
     amount: weiToNumber(props.amount, 8, decimals),
-    unlimited: false,
+    unlimited: true,
   });
 
-  const overlayRef = useRef<HTMLDivElement>(null!);
-  const dialogRef = useRef<HTMLDivElement>(null!);
+  const [approve, approveTx] = useSendTx(() =>
+    erc20Token.approve(address.toLowerCase(), spender.toLowerCase(), weiAmount),
+  );
 
   useEffect(() => {
-    setForm(prevState => ({ ...prevState, amount: weiToNumber(props.amount, 8, decimals) }));
+    setForm(prevState => ({
+      ...prevState,
+      amount: weiToNumber(props.amount, 8, decimals),
+    }));
   }, [props.amount, decimals]);
 
-  useEffect(() => {
+  const retrievePoolData = useCallback(() => {
     if (!native) {
       const multiCallData: MultiCallData[] = [];
 
@@ -68,87 +91,181 @@ const ApproveTokenButton: React.FC<Props> = ({ onSubmit, token, spender, ...prop
       }
 
       if (multiCallData.length) {
-        contractReader.multiCall<{ allowance: string; balance: string }>(multiCallData).then(({ returnData }) => {
-          setState(returnData);
-        }).catch(console.error);
+        contractReader
+          .multiCall<{ allowance: string; balance: string }>(multiCallData)
+          .then(({ returnData }) => {
+            setState(returnData);
+          })
+          .catch(log.error);
       }
     }
   }, [native, address, spender, props.allowance, props.balance, owner]);
 
-  const weiAmount = useWeiAmount(form.unlimited ? UNLIMITED_AMOUNT : (form.amount || '0'), decimals);
+  const weiAmount = useWeiAmount(
+    form.unlimited ? UNLIMITED_AMOUNT : form.amount || '0',
+    decimals,
+  );
 
-  const allowance = useMemo(() => ((props.allowance === undefined) ? state.allowance : props.allowance) || '0', [props.allowance, state.allowance]);
-  const balance = useMemo(() => ((props.balance === undefined) ? state.balance : props.balance) || '0', [props.balance, state.balance]);
+  const allowance = useMemo(
+    () =>
+      (props.allowance === undefined ? state.allowance : props.allowance) ||
+      '0',
+    [props.allowance, state.allowance],
+  );
+  const balance = useMemo(
+    () => (props.balance === undefined ? state.balance : props.balance) || '0',
+    [props.balance, state.balance],
+  );
 
-  const isAllowanceSufficient = useMemo(() => bignumber(allowance).greaterThanOrEqualTo(weiAmount), [allowance, weiAmount]);
+  const isAllowanceSufficient = useMemo(() => {
+    if (bignumber(allowance).greaterThanOrEqualTo(props.amount)) return true;
+    return bignumber(allowance).greaterThanOrEqualTo(weiAmount);
+  }, [allowance, weiAmount, props.amount]);
+  const showApproveScreen = useMemo(
+    () => !native && !isAllowanceSufficient,
+    [native, isAllowanceSufficient],
+  );
+
+  const transaction = useMemo(() => {
+    if (
+      (inApprove || approveTx.status !== TxStatus.NONE || tx === undefined) &&
+      !tx?.loading
+    )
+      return approveTx;
+    return tx;
+  }, [tx, approveTx, inApprove]);
 
   const allowanceButtonDisabled = useMemo(() => {
+    if (transaction.loading) return true;
+
     if (!isOpen) {
-      return !(bignumber(props.amount).greaterThan(0) && bignumber(props.amount).lessThanOrEqualTo(balance));
+      return !(
+        bignumber(props.amount).greaterThan(0) &&
+        bignumber(props.amount).lessThanOrEqualTo(balance)
+      );
     }
     return !bignumber(weiAmount).greaterThan(0);
-  }, [props.amount, weiAmount, balance, isOpen]);
+  }, [props.amount, weiAmount, balance, isOpen, transaction.loading]);
 
-  const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.currentTarget.value;
-    setForm(prevState => ({...prevState, amount: value }));
-  }, []);
+  const handleInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = event.currentTarget.value;
+      setForm(prevState => ({ ...prevState, amount: value }));
+    },
+    [],
+  );
 
   const handleClose = useCallback(() => {
     setOpen(false);
-  }, []);
+    approveTx.clear();
+    tx?.clear();
+  }, [approveTx, tx]);
 
-  const handleClick = useCallback(async () => {
+  const handleApproveClick = useCallback(async () => {
+    setInApprove(true);
     if (!isOpen) {
       setOpen(true);
       return;
     }
 
-    erc20Token.approve(address.toLowerCase(), spender.toLowerCase(), weiAmount).then(result => console.log(result)).catch(error => console.error(error));
+    await approve();
+  }, [isOpen, approve]);
 
-  }, [isOpen, address, spender, weiAmount]);
+  const handleSubmitClick = useCallback(() => {
+    setInApprove(false);
+    handleClose();
+    onSubmit();
+  }, [handleClose, onSubmit]);
+
+  useEffect(() => {
+    retrievePoolData();
+    AppProvider.on(AppProviderEvents.REQUEST_UPDATE, retrievePoolData);
+    return () => {
+      AppProvider.off(AppProviderEvents.REQUEST_UPDATE, retrievePoolData);
+    };
+  }, [retrievePoolData]);
+
+  useEffect(() => {
+    if (tx?.loading) {
+      setOpen(true);
+    }
+  }, [tx?.loading]);
 
   return (
-    <div className="relative">
-      <TransitionGroup appear={true} component={null}>
-        {isOpen && (
-          <CSSTransition key="overlay" classNames="overlay" timeout={300} nodeRef={overlayRef}>
-            <div className="dialog--backdrop" ref={overlayRef}/>
-          </CSSTransition>
+    <>
+      <InDialogApproveModal
+        isOpen={isOpen}
+        onClose={handleClose}
+        tx={transaction}
+        noStatus={
+          showApproveScreen && (
+            <>
+              <p className='mb-3'>
+                Allow {symbol} tokens to be spend by{' '}
+                <AddressLink address={spender} />.
+              </p>
+              <Input
+                type='number'
+                readOnly={form.unlimited}
+                value={form.amount}
+                onChange={handleInputChange}
+              />
+              <label className='mt-2 flex flex-row space-x-2 items-center justify-start'>
+                <input
+                  type='checkbox'
+                  checked={form.unlimited}
+                  onChange={() =>
+                    setForm(value => ({
+                      ...value,
+                      unlimited: !value.unlimited,
+                    }))
+                  }
+                />
+                <span>
+                  Allow spender to use{' '}
+                  <Popover content={`10 million ${symbol} actually.`}>
+                    <span className='cursor-pointer'>unlimited amount</span>
+                  </Popover>
+                  .
+                </span>
+              </label>
+            </>
+          )
+        }
+      >
+        {tx?.status === TxStatus.TX_CONFIRMED ? (
+          <Button
+            type='button'
+            text='Continue'
+            className='w-full z-20 relative'
+            onClick={handleClose}
+          />
+        ) : (
+          <>
+            {showApproveScreen ? (
+              <Button
+                type='button'
+                text={`Approve ${symbol}`}
+                className='w-full z-20 relative'
+                onClick={handleApproveClick}
+                loading={transaction.loading}
+                disabled={allowanceButtonDisabled || transaction.loading}
+              />
+            ) : (
+              <Button
+                type='button'
+                text={props.label}
+                className='w-full z-20 relative'
+                onClick={handleSubmitClick}
+                loading={transaction.loading}
+                disabled={props.amount <= '0' || transaction.loading}
+              />
+            )}
+          </>
         )}
-      </TransitionGroup>
-      <div className={cn("approval-wrapper", isOpen && 'approval-wrapper--open')}>
-        <TransitionGroup appear={true} component={null}>
-          {isOpen && (
-            <CSSTransition key="approval" classNames="approval" timeout={30000} nodeRef={dialogRef}>
-              <div className="approval z-20" ref={dialogRef}>
-                <div className="relative px-12 py-10">
-                  <button type="button" className="fill-current absolute top-2 right-2" onClick={handleClose}>
-                    <Close/>
-                  </button>
-
-                  <p className="mb-3">
-                    Allow {symbol} tokens to be spend by <AddressLink address={spender}/>.
-                  </p>
-                  <Input type="number" readOnly={form.unlimited} value={form.amount} onChange={handleInputChange}/>
-                  <label className="mt-2 flex flex-row space-x-2 items-center justify-start">
-                    <input type="checkbox" value={String(form.unlimited)}
-                           onChange={() => setForm(value => ({ ...value, unlimited: !value.unlimited }))}/>
-                    <span>Allow spender to use <span
-                      title={`10 million ${symbol} actually.`}>unlimited amount</span>.</span>
-                  </label>
-                </div>
-              </div>
-            </CSSTransition>
-          )}
-        </TransitionGroup>
-      </div>
-        {!native && !isAllowanceSufficient ?
-          <Button type="button" text={`Approve ${symbol}`} className="w-full z-20 relative" onClick={handleClick} disabled={allowanceButtonDisabled}/> :
-          <Button type="button" text={props.label} className="w-full z-20 relative" onClick={onSubmit}/>}
-    </div>
+      </InDialogApproveModal>
+    </>
   );
-
 };
 
 ApproveTokenButton.defaultProps = {
