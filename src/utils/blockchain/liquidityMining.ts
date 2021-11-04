@@ -14,6 +14,7 @@ export type LendingInfoResponse = {
   marketLiquidity: string;
   supplyInterestRate: string;
   tokenPrice: string;
+  checkpointPrice: string;
   totalSupply: string;
   totalAssetSupply: string;
   profitOf: string;
@@ -67,6 +68,13 @@ const liquidityMining = new (class LiquidityMining {
           fnName: 'profitOf(address)(uint256)',
           args: [owner],
           key: 'profitOf',
+          parser: value => value[0].toString(),
+        },
+        {
+          address,
+          fnName: 'checkpointPrice(address)(uint256)',
+          args: [owner],
+          key: 'checkpointPrice',
           parser: value => value[0].toString(),
         },
       ];
