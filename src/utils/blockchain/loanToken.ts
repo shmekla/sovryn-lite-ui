@@ -5,6 +5,13 @@ import { zeroAddress } from '../constants';
 import walletService from '../walletService';
 import { getCurrentNetwork } from '../network';
 
+export type BorrowInfoResponse = {
+  marketLiquidity: string;
+  tokenPrice: string;
+  borrowInterestRate: string;
+  totalAssetSupply: string;
+};
+
 const loanToken = new (class LoanToken {
   public getLendingInfo(token: TOKEN, owner?: string) {
     const { address } = getLoanToken(token);
@@ -88,6 +95,13 @@ const loanToken = new (class LoanToken {
       .then(({ returnData }) => returnData);
   }
 
+  public nextInterestRate(token: TOKEN, amount: string) {
+    const { address } = getLoanToken(token);
+    return contractReader
+      .call(address, 'nextSupplyInterestRate(uint256)(uint256)', [amount])
+      .then(result => result[0].toString());
+  }
+
   public lend(token: TOKEN, amount: string) {
     const { address, usesLm } = getLoanToken(token);
     return token === TOKEN.RBTC
@@ -113,6 +127,80 @@ const loanToken = new (class LoanToken {
       }(address,uint256,bool)(uint256)`,
       [(receiver || walletService.address).toLowerCase(), amount, usesLm],
     );
+  }
+
+  // borrowing
+  public nextBorrowInterestRate(token: TOKEN, amount: string) {
+    const { address } = getLoanToken(token);
+    return contractReader
+      .call(address, 'nextBorrowInterestRate(uint256)(uint256)', [amount])
+      .then(result => result[0].toString());
+  }
+
+  public getBorrowingInfo(token: TOKEN) {
+    const { address } = getLoanToken(token);
+    return contractReader
+      .multiCall<BorrowInfoResponse>([
+        {
+          address,
+          fnName: 'marketLiquidity()(uint256)',
+          args: [],
+          key: 'marketLiquidity',
+          parser: value => value[0].toString(),
+        },
+        {
+          address,
+          fnName: 'tokenPrice()(uint256)',
+          args: [],
+          key: 'tokenPrice',
+          parser: value => value[0].toString(),
+        },
+        {
+          address,
+          fnName: 'borrowInterestRate()(uint256)',
+          args: [],
+          key: 'borrowInterestRate',
+          parser: value => value[0].toString(),
+        },
+        {
+          address,
+          fnName: 'totalAssetSupply()(uint256)',
+          args: [],
+          key: 'totalAssetSupply',
+          parser: value => value[0].toString(),
+        },
+      ])
+      .then(({ returnData }) => returnData);
+  }
+
+  public getBorrowAmountForDeposit(
+    loanToken: string,
+    depositAmount: string,
+    initialLoanDuration: number,
+    collateralLoanAddress: string,
+  ) {
+    return contractReader
+      .call(
+        loanToken,
+        'getBorrowAmountForDeposit(uint256,uint256,address)(uint256)',
+        [depositAmount, initialLoanDuration, collateralLoanAddress],
+      )
+      .then(result => result[0].toString());
+  }
+
+  public getDepositAmountForBorrow(
+    loanToken: string,
+    borrowAmount: string,
+    initialLoanDuration: number,
+    collateralLoanAddress: string,
+  ) {
+    return contractReader
+      .call(
+        loanToken,
+        'getDepositAmountForBorrow(uint256,uint256,address)(uint256)',
+        [borrowAmount, initialLoanDuration, collateralLoanAddress],
+      )
+      .then(result => result[0].toString());
   }
 })();
 

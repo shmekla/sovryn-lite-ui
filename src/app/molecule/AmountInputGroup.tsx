@@ -9,9 +9,11 @@ import { ReactComponent as ClearIcon } from 'assets/icons/close.svg';
 type Props = {
   value: string;
   onChange: (value: string) => void;
-  maxAmount: string;
+  maxAmount?: string;
   token?: TOKEN;
   decimals?: number;
+  hideSelector?: boolean;
+  hideBalance?: boolean;
 };
 
 const AmountInputGroup: React.FC<Props> = ({
@@ -20,6 +22,8 @@ const AmountInputGroup: React.FC<Props> = ({
   maxAmount,
   token,
   decimals,
+  hideSelector,
+  hideBalance,
 }) => {
   const handleAmountChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,9 +43,9 @@ const AmountInputGroup: React.FC<Props> = ({
 
   return (
     <>
-      <div className='relative flex-row items-center justify-center'>
+      <div className="relative flex-row items-center justify-center">
         <Input
-          type='number'
+          type="number"
           value={value}
           onChange={handleAmountChange}
           min={0}
@@ -56,18 +60,31 @@ const AmountInputGroup: React.FC<Props> = ({
           )}
           onClick={handleClear}
         >
-          <ClearIcon className='fill-current h-8 w-8' />
+          <ClearIcon className="fill-current h-8 w-8" />
         </button>
       </div>
-      <div className='mt-1 lg:mt-3 flex flex-col items-start space-y-3 lg:flex-row lg:justify-between lg:items-center lg:space-x-4 lg:space-y-0'>
-        <div className='text-gray-600 flex lg:self-start'>
-          {weiToLocaleNumber(maxAmount, 8, getToken(token!)?.decimals || 18)}{' '}
-          {getToken(token!)?.symbol}
+      {(!hideBalance || !hideBalance) && (
+        <div className="mt-1 lg:mt-3 flex flex-col items-start space-y-3 lg:flex-row lg:justify-between lg:items-center lg:space-x-4 lg:space-y-0">
+          {maxAmount !== undefined && !hideBalance && (
+            <div className="text-gray-600 flex lg:self-start">
+              {weiToLocaleNumber(
+                maxAmount,
+                8,
+                getToken(token!)?.decimals || 18,
+              )}{' '}
+              {getToken(token!)?.symbol}
+            </div>
+          )}
+          {maxAmount !== undefined && !hideSelector && (
+            <div className="w-full lg:w-auto">
+              <AmountSelector
+                balance={maxAmount}
+                onChange={handleAmountSelect}
+              />
+            </div>
+          )}
         </div>
-        <div className='w-full lg:w-auto'>
-          <AmountSelector balance={maxAmount} onChange={handleAmountSelect} />
-        </div>
-      </div>
+      )}
     </>
   );
 };

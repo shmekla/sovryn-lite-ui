@@ -10,6 +10,7 @@ const mainnet: LoanTokenType[] = [
     abi: rbtcLoanAbi,
     iTokenSymbol: 'iRBTC',
     usesLm: false,
+    collateralTokens: [TOKEN.XUSD, TOKEN.SOV, TOKEN.DOC, TOKEN.BPRO],
   },
   {
     token: TOKEN.XUSD,
@@ -17,6 +18,7 @@ const mainnet: LoanTokenType[] = [
     abi: loanAbi,
     iTokenSymbol: 'iXUSD',
     usesLm: true,
+    collateralTokens: [TOKEN.RBTC, TOKEN.SOV, TOKEN.DOC, TOKEN.BPRO],
   },
   {
     token: TOKEN.RUSDT,
@@ -24,6 +26,7 @@ const mainnet: LoanTokenType[] = [
     abi: loanAbi,
     iTokenSymbol: 'iRUSDT',
     usesLm: false,
+    collateralTokens: [],
   },
   {
     token: TOKEN.DOC,
@@ -31,6 +34,7 @@ const mainnet: LoanTokenType[] = [
     abi: loanAbi,
     iTokenSymbol: 'iSUSD',
     usesLm: false,
+    collateralTokens: [TOKEN.RBTC, TOKEN.SOV, TOKEN.XUSD, TOKEN.BPRO],
   },
   {
     token: TOKEN.BPRO,
@@ -38,6 +42,7 @@ const mainnet: LoanTokenType[] = [
     abi: loanAbi,
     iTokenSymbol: 'iBPRO',
     usesLm: false,
+    collateralTokens: [TOKEN.RBTC, TOKEN.SOV, TOKEN.XUSD, TOKEN.DOC],
   },
 ];
 

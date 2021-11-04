@@ -7,4 +7,5 @@ export type LoanTokenType = {
   abi: ethers.ContractInterface;
   iTokenSymbol: string;
   usesLm?: boolean;
+  collateralTokens: TOKEN[];
 };

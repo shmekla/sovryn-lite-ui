@@ -3,7 +3,8 @@ import { NETWORK, NetworkSettings } from 'types/network';
 const testnet: NetworkSettings = {
   id: NETWORK.RSK_TESTNET,
   label: 'RSK Testnet',
-  rpcUrl: 'https://public-node.testnet.rsk.co',
+  // rpcUrl: 'https://public-node.testnet.rsk.co',
+  rpcUrl: 'https://testnet.sovryn.app/rpc',
   networkExplorerName: 'RSK Explorer',
   networkExplorerUrl: 'https://explorer.testnet.rsk.co',
   multiCallContractAddress: '0x9e469e1fc7fb4c5d17897b68eaf1afc9df39f103',

@@ -93,62 +93,62 @@ export function LendingPool({
   );
 
   return (
-    <div className='bg-black bg-opacity-10 dark:bg-blue-200 dark:bg-opacity-5 rounded-lg p-6 w-full relative'>
+    <div className="bg-black bg-opacity-10 dark:bg-blue-200 dark:bg-opacity-5 rounded-lg p-6 w-full relative">
       <Spinner
-        className='absolute top-2 right-2'
+        className="absolute top-2 right-2"
         show={state.loading}
         size={16}
         strokeWidth={2}
       />
-      <div className='flex flex-row justify-between items-center'>
+      <div className="flex flex-row justify-between items-center">
         <AddressLink address={asset.address} label={asset.symbol} />
-        <div className='flex flex-row justify-end items-center space-x-4 opacity-25'>
+        <div className="flex flex-row justify-end items-center space-x-4 opacity-25">
           {usesLm && (
             <Popover
               content={<p>This pool gives SOV rewards for lending.</p>}
               showHelpIcon
             >
-              <span className='text-xs'>LM rewards</span>
+              <span className="text-xs">LM rewards</span>
             </Popover>
           )}
         </div>
       </div>
-      <div className='my-6 flex flex-row justify-between truncate'>
+      <div className="my-6 flex flex-row justify-between truncate">
         <div className={classNames(showBalance ? 'w-1/2' : 'w-full')}>
-          <div className='mb-3'>
-            <div className='opacity-25 text-xs mb-1'>Interest APR:</div>
-            <div className='truncate'>
+          <div className="mb-3">
+            <div className="opacity-25 text-xs mb-1">Interest:</div>
+            <div className="truncate">
               {weiToLocaleNumber(state.supplyInterestRate, 2)} %
             </div>
           </div>
           <div>
-            <div className='opacity-25 text-xs mb-1'>Liquidity:</div>
-            <div className='truncate'>
+            <div className="opacity-25 text-xs mb-1">Liquidity:</div>
+            <div className="truncate">
               {nFormatter(weiToNumber(state.marketLiquidity, 2))}
             </div>
           </div>
         </div>
         {showBalance && (
-          <div className='w-1/2 text-right'>
-            <div className='mb-3 truncate'>
-              <div className='opacity-25 text-xs mb-1 truncate'>Balance:</div>
-              <div className='truncate'>
+          <div className="w-1/2 text-right">
+            <div className="mb-3 truncate">
+              <div className="opacity-25 text-xs mb-1 truncate">Balance:</div>
+              <div className="truncate">
                 {weiToLocaleNumber(state.assetBalanceOf, 8)}
               </div>
             </div>
             <div>
-              <div className='opacity-25 text-xs mb-1'>Profit:</div>
-              <div className='truncate'>
+              <div className="opacity-25 text-xs mb-1">Profit:</div>
+              <div className="truncate">
                 {weiToLocaleNumber(state.profitOf, 8)}
               </div>
             </div>
           </div>
         )}
       </div>
-      <div className='flex flex-row justify-center space-x-8'>
-        <Button onClick={handleLendClick} text='Lend' />
+      <div className="flex flex-row justify-center space-x-8">
+        <Button onClick={handleLendClick} text="Lend" />
         {showBalance && (
-          <Button onClick={handleUnlendClick} text='Unlend' intent='danger' />
+          <Button onClick={handleUnlendClick} text="Unlend" intent="danger" />
         )}
       </div>
     </div>

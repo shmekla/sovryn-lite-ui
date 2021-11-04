@@ -1,13 +1,13 @@
 export enum TOKEN {
-  RBTC,
-  SOV,
-  XUSD,
-  RUSDT,
-  DOC,
-  BNBS,
-  ETHS,
-  BPRO,
-  FISH,
+  RBTC = 'rbtc',
+  SOV = 'sov',
+  XUSD = 'xusd',
+  RUSDT = 'rusdt',
+  DOC = 'doc',
+  BNBS = 'bnbs',
+  ETHS = 'eths',
+  BPRO = 'bpro',
+  FISH = 'fish',
 }
 
 export type TokenType = {

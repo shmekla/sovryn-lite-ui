@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import log from 'loglevel';
 import { TOKEN } from 'types/token';
 import { Dialog } from 'app/molecule/Dialog';
 import loanToken from 'utils/blockchain/loanToken';
@@ -59,20 +60,38 @@ const LendDialog: React.FC<Props> = props => {
     [props.pool, props.state, rbtcBalance],
   );
 
+  const [nextInterest, setNextInterest] = useState(
+    props.state?.supplyInterestRate,
+  );
+
+  useEffect(() => {
+    if (token) {
+      loanToken
+        .nextInterestRate(token.id, weiAmount)
+        .then(setNextInterest)
+        .catch(log.error);
+    }
+  }, [weiAmount, token]);
+
+  const interest = useMemo(
+    () => nextInterest || props.state?.supplyInterestRate || '0',
+    [props.state, nextInterest],
+  );
+
   return (
     <Dialog isOpen={props.isOpen} onClose={props.onClose}>
       <>
         {props.isOpen && props.state && (
           <>
-            <div className='flex justify-between items-center mb-2'>
+            <div className="flex justify-between items-center mb-2">
               <div>Asset</div>
               <div>{token?.symbol}</div>
             </div>
-            <div className='flex justify-between items-center mb-2'>
+            <div className="flex justify-between items-center mb-2">
               <div>Interest APR</div>
-              <div>{weiToLocaleNumber(props.state.supplyInterestRate, 3)}%</div>
+              <div>{weiToLocaleNumber(interest, 3)}%</div>
             </div>
-            <div className='mb-3'>
+            <div className="mb-3">
               <AmountInputGroup
                 value={amount}
                 onChange={handleAmountChange}
@@ -80,7 +99,7 @@ const LendDialog: React.FC<Props> = props => {
                 token={token?.id}
               />
             </div>
-            <div className='mb-3 text-right'>
+            <div className="mb-3 text-right">
               <AddressLink
                 address={loan?.address}
                 label={<>You will receive {loan?.iTokenSymbol}</>}
@@ -88,7 +107,7 @@ const LendDialog: React.FC<Props> = props => {
             </div>
 
             <ApproveTokenButton
-              label='Lend'
+              label="Lend"
               amount={weiAmount}
               token={token}
               spender={loan.address}

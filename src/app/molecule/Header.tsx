@@ -3,6 +3,7 @@ import { ReactComponent as Logo } from 'assets/logo.svg';
 import HeaderNavigation from '../atom/HeaderNavigation';
 import UserWalletContainer from './UserWalletContainer';
 import RequestUpdateButton from './RequestUpdateButton';
+import { Link } from 'react-router-dom';
 // import { ReactComponent as Moon } from '../../assets/icons/moon.svg';
 
 export default function Header() {
@@ -42,14 +43,16 @@ export default function Header() {
   // }, [dark]);
 
   return (
-    <header className='mb-12 flex-grow-0 flex-shrink-0'>
-      <div className='container py-3'>
-        <div className='flex space-x-8 justify-between items-center'>
-          <div className='flex justify-start items-center space-x-8'>
-            <Logo className='w-12 h-12 ' />
+    <header className="mb-12 flex-grow-0 flex-shrink-0">
+      <div className="container py-3">
+        <div className="flex space-x-8 justify-between items-center">
+          <div className="flex justify-start items-center space-x-8">
+            <Link to="/">
+              <Logo className="w-12 h-12 " />
+            </Link>
             <HeaderNavigation />
           </div>
-          <div className='flex flex-row space-x-4 justify-end items-center z-20'>
+          <div className="flex flex-row space-x-4 justify-end items-center z-20">
             <UserWalletContainer />
             <RequestUpdateButton />
             {/*<button onClick={changeTheme}><Moon className="fill-current text-black dark:text-white" /></button>*/}

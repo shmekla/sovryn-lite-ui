@@ -1,41 +1,35 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 export default function HeaderNavigation() {
   return (
-    <nav className='hidden sm:block'>
-      <ul className='flex justify-start items-center space-x-6'>
+    <nav className="hidden sm:block">
+      <ul className="flex justify-start items-center space-x-6">
         {/*<li>*/}
-        {/*  <Link*/}
+        {/*  <NavLink*/}
         {/*    to='/'*/}
         {/*    className='text-blue-400 dark:text-white dark:opacity-75 transition duration-300 hover:text-blue-200'*/}
         {/*  >*/}
         {/*    Home*/}
-        {/*  </Link>*/}
+        {/*  </NavLink>*/}
         {/*</li>*/}
         <li>
-          <Link
-            to='/lend'
-            className='dark:text-white opacity-75 transition duration-300 hover:text-blue-200'
-          >
+          <NavLink to="/lend" className="nav-link" exact>
             Lend
-          </Link>
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/borrow" className="nav-link" exact>
+            Borrow
+          </NavLink>
         </li>
         {/*<li>*/}
-        {/*  <Link*/}
-        {/*    to='/borrow'*/}
-        {/*    className='dark:text-white opacity-75 transition duration-300 hover:text-blue-200'*/}
-        {/*  >*/}
-        {/*    Borrow*/}
-        {/*  </Link>*/}
-        {/*</li>*/}
-        {/*<li>*/}
-        {/*  <Link*/}
+        {/*  <NavLink*/}
         {/*    to='/pool'*/}
         {/*    className='dark:text-white opacity-75 transition duration-300 hover:text-blue-200'*/}
         {/*  >*/}
         {/*    Pool*/}
-        {/*  </Link>*/}
+        {/*  </NavLink>*/}
         {/*</li>*/}
       </ul>
     </nav>
