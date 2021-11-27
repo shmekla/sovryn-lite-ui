@@ -6,6 +6,8 @@ import React, {
   useState,
 } from 'react';
 import log from 'loglevel';
+import classNames from 'classnames';
+import { bignumber } from 'mathjs';
 import type { LoanTokenType } from 'types/loanToken';
 import {
   getToken,
@@ -21,7 +23,6 @@ import liquidityMining, {
 import { TOKEN } from '../../../../types/token';
 import Button from '../../../atom/Button';
 import AppProvider, { AppProviderEvents } from '../../../../utils/AppProvider';
-import classNames from 'classnames';
 import Spinner from '../../../atom/Spinner';
 import Popover from '../../../atom/Popover';
 
@@ -49,6 +50,7 @@ export function LendingPool({
     balanceOf: '0',
     assetBalanceOf: '0',
     tokenPrice: '0',
+    checkpointPrice: '0',
     totalSupply: '0',
     totalAssetSupply: '0',
     getUserAccumulatedReward: '0',
@@ -91,6 +93,26 @@ export function LendingPool({
     () => Number(state.assetBalanceOf) > 0 && owner,
     [state.assetBalanceOf, owner],
   );
+
+  const profit = useMemo(() => {
+    if (usesLm) {
+      return bignumber(state.tokenPrice)
+        .sub(state.checkpointPrice)
+        .mul(bignumber(state.balanceOf).add(state.getUserPoolTokenBalance))
+        .div(Math.pow(10, asset.decimals))
+        .add(state.profitOf)
+        .toFixed(0);
+    }
+    return state.profitOf;
+  }, [
+    usesLm,
+    state.tokenPrice,
+    state.checkpointPrice,
+    state.balanceOf,
+    state.getUserPoolTokenBalance,
+    state.profitOf,
+    asset.decimals,
+  ]);
 
   return (
     <div className="bg-black bg-opacity-10 dark:bg-blue-200 dark:bg-opacity-5 rounded-lg p-6 w-full relative">
@@ -138,9 +160,7 @@ export function LendingPool({
             </div>
             <div>
               <div className="opacity-25 text-xs mb-1">Profit:</div>
-              <div className="truncate">
-                {weiToLocaleNumber(state.profitOf, 8)}
-              </div>
+              <div className="truncate">{weiToLocaleNumber(profit, 8)}</div>
             </div>
           </div>
         )}
