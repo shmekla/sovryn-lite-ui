@@ -30,25 +30,25 @@ const AssetRow: React.FC<Props> = ({ token }) => {
   const [transfer, setTransfer] = useState(false);
   return (
     <>
-      <div className='bg-white bg-opacity-5 px-3 py-2 flex flex-row justify-between items-center space-x-4 rounded mb-2 relative'>
-        <div className='w-24'>
+      <div className="bg-white bg-opacity-5 px-3 py-2 flex flex-row justify-between items-center space-x-4 rounded mb-2 relative">
+        <div className="w-24">
           <AddressLink address={token.address} label={token.symbol} />
         </div>
-        <div className='flex flex-row justify-end items-center space-x-2'>
-          <div className='relative'>
+        <div className="flex flex-row justify-end items-center space-x-2">
+          <div className="relative">
             {weiToLocaleNumber(value, 6, token.decimals)}{' '}
             <div
-              className='absolute'
+              className="absolute"
               style={{ top: '-0.25rem', right: '-0.25rem' }}
             >
-              <Spinner show={loading} className='' size={8} strokeWidth={2} />
+              <Spinner show={loading} className="" size={8} strokeWidth={2} />
             </div>
           </div>
           <button
             onClick={() => setTransfer(true)}
-            className='w-8 h-8 rounded bg-blue-300 bg-opacity-25 flex flex-row justify-center items-center'
+            className="w-8 h-8 rounded bg-blue-300 bg-opacity-25 flex flex-row justify-center items-center"
           >
-            <SendIcon className='w-4 h-4 fill-current' />
+            <SendIcon className="w-4 h-4 fill-current" />
           </button>
         </div>
       </div>
@@ -85,7 +85,7 @@ function WalletPage() {
         <title>Wallet</title>
       </Helmet>
       <main>
-        <div className='container'>
+        <div className="container">
           {tokens.map(item => (
             <AssetRow key={item.address} token={item} />
           ))}

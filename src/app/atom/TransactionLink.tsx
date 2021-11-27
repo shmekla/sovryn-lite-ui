@@ -14,7 +14,7 @@ export function TransactionLink({ tx, label }: TransactionLinkProps) {
   );
   return (
     <>
-      <a href={url} target='_blank' rel='noreferrer noopener'>
+      <a href={url} target="_blank" rel="noreferrer noopener">
         {label || prettyTx(tx)}
       </a>
     </>

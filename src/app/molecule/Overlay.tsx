@@ -46,11 +46,11 @@ export function Overlay(props: OverlayProps) {
       return (
         <CSSTransition
           nodeRef={overlayRef}
-          classNames='overlay'
+          classNames="overlay"
           timeout={300}
-          key='__backdrop'
+          key="__backdrop"
         >
-          <div ref={overlayRef} className='dialog--backdrop' />
+          <div ref={overlayRef} className="dialog--backdrop" />
         </CSSTransition>
       );
     }
@@ -88,7 +88,7 @@ export function Overlay(props: OverlayProps) {
       return (
         <CSSTransition
           nodeRef={childRef}
-          classNames='dialog'
+          classNames="dialog"
           timeout={300}
           key={index}
         >

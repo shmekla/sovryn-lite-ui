@@ -14,7 +14,7 @@ export function AddressLink({ address, label }: AddressLinkProps) {
   );
   return (
     <>
-      <a href={url} target='_blank' rel='noreferrer noopener'>
+      <a href={url} target="_blank" rel="noreferrer noopener">
         {label || prettyTx(address)}
       </a>
     </>

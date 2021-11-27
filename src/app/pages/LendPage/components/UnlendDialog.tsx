@@ -61,9 +61,13 @@ function UnlendDialog(props: Props) {
     .toFixed(0);
 
   const iTokenAmount = useMemo(() => {
-    const tokenAmount = bignumber(weiAmount)
+    let tokenAmount = bignumber(weiAmount)
       .div(state.tokenPrice || '0')
-      .mul(1e18);
+      .mul(10 ** 18);
+
+    if (tokenAmount.isNaN()) {
+      tokenAmount = bignumber(0);
+    }
 
     // make sure there is no dust amount left when withdrawing
     if (tokenAmount.add(0.00001 * 1e18).greaterThanOrEqualTo(totalBalance)) {
@@ -107,15 +111,15 @@ function UnlendDialog(props: Props) {
       <>
         {props.isOpen && (
           <>
-            <div className='flex justify-between items-center mb-2'>
+            <div className="flex justify-between items-center mb-2">
               <div>Asset</div>
               <div>{token?.symbol}</div>
             </div>
-            <div className='flex justify-between items-center mb-2'>
+            <div className="flex justify-between items-center mb-2">
               <div>Interest APR</div>
               <div>{weiToLocaleNumber(state.supplyInterestRate, 3)}%</div>
             </div>
-            <div className='mb-3'>
+            <div className="mb-3">
               <AmountInputGroup
                 value={amount}
                 onChange={handleAmountChange}
@@ -124,23 +128,23 @@ function UnlendDialog(props: Props) {
               />
             </div>
             {loan?.usesLm && (
-              <div className='mb-3'>
-                <div className='opacity-25 text-xs mb-1'>
+              <div className="mb-3">
+                <div className="opacity-25 text-xs mb-1">
                   Liquidity Mining SOV Rewards:
                 </div>
-                <div className='truncate'>
+                <div className="truncate">
                   {weiToLocaleNumber(state.getUserAccumulatedReward || '0', 18)}
                 </div>
               </div>
             )}
-            <div className='mb-3 text-right'>
+            <div className="mb-3 text-right">
               <AddressLink
                 address={token?.address}
                 label={<>You will receive {token?.symbol}</>}
               />
             </div>
             <TransferButton
-              label='Unlend'
+              label="Unlend"
               onSubmit={handleSubmit}
               token={tokenForUnlend}
               tx={tx}

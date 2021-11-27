@@ -64,9 +64,9 @@ const Popover: React.FC<Props> = ({
           childRect={childRect}
           popoverRect={popoverRect}
           arrowSize={12}
-          arrowColor='#111827'
+          arrowColor="#111827"
         >
-          <div className='popover'>{content}</div>
+          <div className="popover">{content}</div>
         </ArrowContainer>
       )}
       onClickOutside={handleEvent('leave')}

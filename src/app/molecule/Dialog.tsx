@@ -19,13 +19,13 @@ export function Dialog(props: DialogProps) {
 
   return (
     <Overlay isOpen={props.isOpen}>
-      <div className='dialog-wrapper'>
+      <div className="dialog-wrapper">
         <div className={cn('dialog--container', props.className)}>
-          <div className='dialog'>
+          <div className="dialog">
             {props.onClose && (
               <button
-                type='button'
-                className='fill-current absolute top-2 right-2'
+                type="button"
+                className="fill-current absolute top-2 right-2"
                 onClick={handleClose}
               >
                 <Close />

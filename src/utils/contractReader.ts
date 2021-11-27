@@ -133,12 +133,16 @@ const contractReader = new (class ContractReader {
       );
   }
 
-  public async send(
+  public async send<T = string>(
     to: string,
     methodAndTypes: string,
     args: ReadonlyArray<any>,
     request?: TransactionRequest,
+    simulate?: boolean,
   ) {
+    if (simulate) {
+      return this.call<T>(to, methodAndTypes, args, request);
+    }
     const data = encodeFunctionData(methodAndTypes, args);
     return await walletService.sendTransaction({
       to: to,

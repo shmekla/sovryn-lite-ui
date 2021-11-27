@@ -86,17 +86,17 @@ const TransferButton: React.FC<Props> = ({ onSubmit, token, tx, ...props }) => {
       <InDialogApproveModal isOpen={isOpen} onClose={handleClose} tx={tx}>
         {tx?.status === TxStatus.TX_CONFIRMED ? (
           <Button
-            type='button'
-            text='Continue'
-            className='w-full z-20 relative'
+            type="button"
+            text="Continue"
+            className="w-full z-20 relative"
             onClick={handleClose}
           />
         ) : (
           <>
             <Button
-              type='button'
+              type="button"
               text={props.label}
-              className='w-full z-20 relative'
+              className="w-full z-20 relative"
               onClick={handleSubmitClick}
               loading={tx.loading}
               disabled={disabled}

@@ -24,6 +24,7 @@ import ApproveTokenButton from '../../../molecule/ApproveTokenButton';
 import { useSendTx } from '../../../hooks/useSendTx';
 import { useBalance } from '../../../hooks/useBalance';
 import Select from '../../../atom/Select';
+import Input from 'app/atom/Input';
 
 type Props = {
   pool: TOKEN;
@@ -40,10 +41,10 @@ const BorrowDialog: React.FC<Props> = props => {
   const [lastInput, setLastInput] = useState<LastInputType>('deposit');
   const [depositAmount, setDepositAmount] = useState('');
   const [borrowAmount, setBorrowAmount] = useState('');
-  const [initialLoanDuration, setInitialLoanDuration] = useState(28);
+  const [initialLoanDuration, setInitialLoanDuration] = useState('28');
 
   const loanDuration = useMemo(
-    () => initialLoanDuration * 60 * 60 * 24,
+    () => Number(initialLoanDuration) * 60 * 60 * 24,
     [initialLoanDuration],
   );
 
@@ -166,7 +167,7 @@ const BorrowDialog: React.FC<Props> = props => {
 
   useEffect(() => {
     triggerAmountUpdates();
-  }, [collateral, triggerAmountUpdates]);
+  }, [collateral, loanDuration, triggerAmountUpdates]);
 
   return (
     <Dialog isOpen={props.isOpen} onClose={props.onClose}>
@@ -190,7 +191,7 @@ const BorrowDialog: React.FC<Props> = props => {
                 onChange={handleBorrowAmountChange}
                 token={token?.id}
                 hideSelector
-                hideBalance
+                maxAmount={balance}
               />
             </div>
 
@@ -216,6 +217,20 @@ const BorrowDialog: React.FC<Props> = props => {
                 onChange={handleDepositAmountChange}
                 maxAmount={collateralBalance}
                 token={collateral}
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="control-label">
+                Initial loan duration (days):
+              </label>
+              <Input
+                type="number"
+                value={initialLoanDuration}
+                onChange={e => setInitialLoanDuration(e.currentTarget.value)}
+                min={1}
+                max={1515}
+                step={1}
               />
             </div>
 

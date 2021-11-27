@@ -200,19 +200,19 @@ const ApproveTokenButton: React.FC<Props> = ({
         noStatus={
           showApproveScreen && (
             <>
-              <p className='mb-3'>
+              <p className="mb-3">
                 Allow {symbol} tokens to be spend by{' '}
                 <AddressLink address={spender} />.
               </p>
               <Input
-                type='number'
+                type="number"
                 readOnly={form.unlimited}
                 value={form.amount}
                 onChange={handleInputChange}
               />
-              <label className='mt-2 flex flex-row space-x-2 items-center justify-start'>
+              <label className="mt-2 flex flex-row space-x-2 items-center justify-start">
                 <input
-                  type='checkbox'
+                  type="checkbox"
                   checked={form.unlimited}
                   onChange={() =>
                     setForm(value => ({
@@ -224,7 +224,7 @@ const ApproveTokenButton: React.FC<Props> = ({
                 <span>
                   Allow spender to use{' '}
                   <Popover content={`10 million ${symbol} actually.`}>
-                    <span className='cursor-pointer'>unlimited amount</span>
+                    <span className="cursor-pointer">unlimited amount</span>
                   </Popover>
                   .
                 </span>
@@ -235,27 +235,27 @@ const ApproveTokenButton: React.FC<Props> = ({
       >
         {tx?.status === TxStatus.TX_CONFIRMED ? (
           <Button
-            type='button'
-            text='Continue'
-            className='w-full z-20 relative'
+            type="button"
+            text="Continue"
+            className="w-full z-20 relative"
             onClick={handleClose}
           />
         ) : (
           <>
             {showApproveScreen ? (
               <Button
-                type='button'
+                type="button"
                 text={`Approve ${symbol}`}
-                className='w-full z-20 relative'
+                className="w-full z-20 relative"
                 onClick={handleApproveClick}
                 loading={transaction.loading}
                 disabled={allowanceButtonDisabled || transaction.loading}
               />
             ) : (
               <Button
-                type='button'
+                type="button"
                 text={props.label}
-                className='w-full z-20 relative'
+                className="w-full z-20 relative"
                 onClick={handleSubmitClick}
                 loading={transaction.loading}
                 disabled={props.amount <= '0' || transaction.loading}

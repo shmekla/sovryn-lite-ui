@@ -8,7 +8,7 @@ function NotFoundPage() {
         <title>Not Found</title>
       </Helmet>
       <main>
-        <div className='container'>
+        <div className="container">
           <h1>Not Found</h1>
           <p>Page not found.</p>
         </div>

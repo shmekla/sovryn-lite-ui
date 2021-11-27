@@ -14,10 +14,10 @@ const FeatureItem: React.FC<FeatureItemProps & LinkProps> = ({
   return (
     <Link
       {...props}
-      className='h-64 bg-blue-700 rounded-lg p-6 bg-opacity-25 hover:bg-opacity-30 transition duration-300'
+      className="h-64 bg-blue-700 rounded-lg p-6 bg-opacity-25 hover:bg-opacity-30 transition duration-300"
     >
       <h2>{title}</h2>
-      <p className='opacity-75 text-sm'>{description}</p>
+      <p className="opacity-75 text-sm">{description}</p>
     </Link>
   );
 };

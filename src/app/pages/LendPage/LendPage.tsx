@@ -16,6 +16,7 @@ import walletService from '../../../utils/walletService';
 import UnlendDialog from './components/UnlendDialog';
 import AppProvider from '../../../utils/AppProvider';
 import { LendingInfoResponse } from '../../../utils/blockchain/liquidityMining';
+import { ErrorBoundary } from 'app/molecule/ErrorBoundary';
 
 function LendPage() {
   const { connected, address } = useContext(AppContext);
@@ -81,32 +82,37 @@ function LendPage() {
         <title>Lend</title>
       </Helmet>
       <main>
-        <div className='container'>
+        <div className="container">
           <h1>Lend</h1>
 
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {loanPools.map(pool => (
-              <LendingPool
-                key={pool.token}
-                {...pool}
-                onLend={openLend}
-                onUnlend={openUnlend}
-              />
+              <ErrorBoundary key={pool.token}>
+                <LendingPool
+                  {...pool}
+                  onLend={openLend}
+                  onUnlend={openUnlend}
+                />
+              </ErrorBoundary>
             ))}
           </div>
 
-          <LendDialog
-            pool={dialogs.token!}
-            state={dialogs.state!}
-            isOpen={dialogs.lend}
-            onClose={closeDialog}
-          />
-          <UnlendDialog
-            pool={dialogs.token!}
-            state={dialogs.state!}
-            isOpen={dialogs.unlend}
-            onClose={closeDialog}
-          />
+          <ErrorBoundary>
+            <LendDialog
+              pool={dialogs.token!}
+              state={dialogs.state!}
+              isOpen={dialogs.lend}
+              onClose={closeDialog}
+            />
+          </ErrorBoundary>
+          <ErrorBoundary>
+            <UnlendDialog
+              pool={dialogs.token!}
+              state={dialogs.state!}
+              isOpen={dialogs.unlend}
+              onClose={closeDialog}
+            />
+          </ErrorBoundary>
         </div>
       </main>
     </>

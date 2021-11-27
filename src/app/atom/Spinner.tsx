@@ -23,13 +23,13 @@ const Spinner: React.FC<SpinnerProps> = ({
     <TransitionGroup appear={true} component={null}>
       {show && (
         <CSSTransition
-          key='spinner'
+          key="spinner"
           nodeRef={ref}
           timeout={300}
-          classNames='spinner'
+          classNames="spinner"
         >
           <div className={cn(className)} ref={ref}>
-            <div className='animate-spin'>
+            <div className="animate-spin">
               <CircularProgress
                 progress={50}
                 size={size}

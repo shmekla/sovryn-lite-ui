@@ -20,13 +20,13 @@ export const AddressInputGroup: React.FC<Props> = ({ value, onChange }) => {
 
   return (
     <>
-      <div className='relative flex-row items-center justify-center'>
+      <div className="relative flex-row items-center justify-center">
         <Input
-          type='text'
+          type="text"
           value={value}
           onChange={handleAmountChange}
           className={cn(value && 'pr-10')}
-          autoComplete='off'
+          autoComplete="off"
         />
         <button
           className={cn(
@@ -35,7 +35,7 @@ export const AddressInputGroup: React.FC<Props> = ({ value, onChange }) => {
           )}
           onClick={handleClear}
         >
-          <ClearIcon className='fill-current h-8 w-8' />
+          <ClearIcon className="fill-current h-8 w-8" />
         </button>
       </div>
     </>

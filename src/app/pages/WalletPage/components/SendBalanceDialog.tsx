@@ -40,14 +40,14 @@ export const SendBalanceDialog: React.FC<Props> = ({ token, ...props }) => {
       <>
         {props.isOpen && (
           <>
-            <div className='flex justify-between items-center mb-2'>
+            <div className="flex justify-between items-center mb-2">
               <div>Transfer Asset</div>
             </div>
-            <div className='mb-3'>
+            <div className="mb-3">
               <label>Receiver:</label>
               <AddressInputGroup value={receiver} onChange={setReceiver} />
             </div>
-            <div className='mb-3'>
+            <div className="mb-3">
               <label>Amount:</label>
               <AmountInputGroup
                 value={amount}
@@ -57,7 +57,7 @@ export const SendBalanceDialog: React.FC<Props> = ({ token, ...props }) => {
               />
             </div>
             <TransferButton
-              label='Transfer'
+              label="Transfer"
               onSubmit={send}
               token={token}
               balance={props.balance}

@@ -38,16 +38,16 @@ export const InDialogApproveModal: React.FC<Props> = ({
   );
 
   return (
-    <div className='relative'>
+    <div className="relative">
       <TransitionGroup appear={true} component={null}>
         {isOpen && (
           <CSSTransition
-            key='overlay'
-            classNames='overlay'
+            key="overlay"
+            classNames="overlay"
             timeout={300}
             nodeRef={overlayRef}
           >
-            <div className='dialog--backdrop' ref={overlayRef} />
+            <div className="dialog--backdrop" ref={overlayRef} />
           </CSSTransition>
         )}
       </TransitionGroup>
@@ -57,17 +57,17 @@ export const InDialogApproveModal: React.FC<Props> = ({
         <TransitionGroup appear={true} component={null}>
           {isOpen && (
             <CSSTransition
-              key='approval'
-              classNames='approval'
+              key="approval"
+              classNames="approval"
               timeout={300}
               nodeRef={dialogRef}
             >
-              <div className='approval z-20' ref={dialogRef}>
-                <div className='relative px-12 py-10'>
+              <div className="approval z-20" ref={dialogRef}>
+                <div className="relative px-12 py-10">
                   {showCloseButton && (
                     <button
-                      type='button'
-                      className='fill-current absolute top-2 right-2'
+                      type="button"
+                      className="fill-current absolute top-2 right-2"
                       onClick={onClose}
                     >
                       <Close />
@@ -76,9 +76,9 @@ export const InDialogApproveModal: React.FC<Props> = ({
 
                   {tx.status === TxStatus.NONE && props.noStatus}
                   {tx.status === TxStatus.USER_PENDING && (
-                    <div className='flex flex-row justify-start items-center space-x-4'>
-                      <div className='w-16 h-16 flex justify-center items-center'>
-                        <Clock className='fill-current w-8 h-8 motion-safe:animate-ping' />
+                    <div className="flex flex-row justify-start items-center space-x-4">
+                      <div className="w-16 h-16 flex justify-center items-center">
+                        <Clock className="fill-current w-8 h-8 motion-safe:animate-ping" />
                       </div>
                       <div>
                         <p>Confirm transaction in your wallet.</p>
@@ -86,9 +86,9 @@ export const InDialogApproveModal: React.FC<Props> = ({
                     </div>
                   )}
                   {tx.status === TxStatus.TX_BROADCASTING && (
-                    <div className='flex flex-row justify-start items-center space-x-4'>
+                    <div className="flex flex-row justify-start items-center space-x-4">
                       <div>
-                        <Refresh className='fill-current w-16 h-16 animate-reverse-spin' />
+                        <Refresh className="fill-current w-16 h-16 animate-reverse-spin" />
                       </div>
                       <div>
                         <p>Broadcasting transaction to network.</p>
@@ -97,9 +97,9 @@ export const InDialogApproveModal: React.FC<Props> = ({
                     </div>
                   )}
                   {tx.status === TxStatus.TX_PENDING && (
-                    <div className='flex flex-row justify-start items-center space-x-4'>
+                    <div className="flex flex-row justify-start items-center space-x-4">
                       <div>
-                        <Refresh className='fill-current w-16 h-16 animate-reverse-spin' />
+                        <Refresh className="fill-current w-16 h-16 animate-reverse-spin" />
                       </div>
                       <div>
                         <p>Transaction pending for confirmation.</p>
@@ -108,9 +108,9 @@ export const InDialogApproveModal: React.FC<Props> = ({
                     </div>
                   )}
                   {tx.status === TxStatus.TX_CONFIRMED && (
-                    <div className='flex flex-row justify-start items-center space-x-4 text-green-500'>
-                      <div className='w-16 h-16 flex justify-center items-center'>
-                        <Check className='fill-current w-8 h-8 motion-safe:animate-ping-once' />
+                    <div className="flex flex-row justify-start items-center space-x-4 text-green-500">
+                      <div className="w-16 h-16 flex justify-center items-center">
+                        <Check className="fill-current w-8 h-8 motion-safe:animate-ping-once" />
                       </div>
                       <div>
                         <p>Transaction confirmed</p>
@@ -119,9 +119,9 @@ export const InDialogApproveModal: React.FC<Props> = ({
                     </div>
                   )}
                   {tx.status === TxStatus.TX_FAILED && (
-                    <div className='flex flex-row justify-start items-center space-x-4 text-red-500'>
+                    <div className="flex flex-row justify-start items-center space-x-4 text-red-500">
                       <div>
-                        <Close className='fill-current w-16 h-16 motion-safe:animate-ping-once' />
+                        <Close className="fill-current w-16 h-16 motion-safe:animate-ping-once" />
                       </div>
                       <div>
                         <p>Transaction failed:</p>
@@ -131,9 +131,9 @@ export const InDialogApproveModal: React.FC<Props> = ({
                     </div>
                   )}
                   {tx.status === TxStatus.USER_DECLINED && (
-                    <div className='flex flex-row justify-start items-center space-x-4 text-red-500'>
+                    <div className="flex flex-row justify-start items-center space-x-4 text-red-500">
                       <div>
-                        <Close className='fill-current w-16 h-16 motion-safe:animate-ping-once' />
+                        <Close className="fill-current w-16 h-16 motion-safe:animate-ping-once" />
                       </div>
                       <div>
                         <p>Transaction rejected:</p>

@@ -29,16 +29,16 @@ const CircularProgress: React.FC<Partial<Props>> = ({
           cx={center}
           cy={center}
           r={radius}
-          stroke='rgba(255, 255, 255, 0.25)'
-          fill='transparent'
+          stroke="rgba(255, 255, 255, 0.25)"
+          fill="transparent"
           strokeWidth={strokeWidth}
         />
         <circle
           cx={center}
           cy={center}
           r={radius}
-          stroke='rgba(37, 99, 235, 0.75)'
-          fill='transparent'
+          stroke="rgba(37, 99, 235, 0.75)"
+          fill="transparent"
           strokeWidth={strokeWidth}
           strokeDasharray={circumference}
           strokeDashoffset={offset}

@@ -129,6 +129,19 @@ const loanToken = new (class LoanToken {
     );
   }
 
+  public unlendStatic(token: TOKEN, amount: string, receiver?: string) {
+    const { address, usesLm } = getLoanToken(token);
+    return contractReader.send(
+      address,
+      `${
+        token === TOKEN.RBTC ? 'burnToBTC' : 'burn'
+      }(address,uint256,bool)(uint256)`,
+      [(receiver || walletService.address).toLowerCase(), amount, usesLm],
+      undefined,
+      true,
+    );
+  }
+
   // borrowing
   public nextBorrowInterestRate(token: TOKEN, amount: string) {
     const { address } = getLoanToken(token);

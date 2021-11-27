@@ -13,8 +13,8 @@ const EngageWalletHeaderButton: React.FC<
       )}
       {...props}
     >
-      <Icon className='fill-current' />
-      <span className='hidden sm:block truncate'>Engage Wallet</span>
+      <Icon className="fill-current" />
+      <span className="hidden sm:block truncate">Engage Wallet</span>
     </button>
   );
 };
